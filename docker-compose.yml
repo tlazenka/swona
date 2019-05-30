@@ -1,0 +1,19 @@
+version: '2'
+services:
+  repl:
+    build:
+        context: .
+        dockerfile: Dockerfile.swift
+    volumes:
+      - .:/app
+    working_dir: /app/Repl
+    command: swift run
+    privileged: true
+  tests:
+    build:
+        context: .
+        dockerfile: Dockerfile.swift
+    volumes:
+      - .:/app
+    working_dir: /app/Swona
+    command: swift test
