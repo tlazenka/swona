@@ -186,7 +186,7 @@ public class ArrayReference: Hashable {
         hasher.combine(ObjectIdentifier(self).hashValue)
     }
     
-    internal var array: Array<Value>
+    internal(set) public var array: Array<Value>
     
     init(array: Array<Value>) {
         self.array = array
@@ -206,5 +206,25 @@ public class FunctionReference: Hashable {
     
     init(function: @escaping (Array<Value>) throws -> Value) {
         self.function = function
+    }
+}
+
+// Helper properties to make values easily out of Kotlin literals. (e.g. "foo".value or 123.value)
+
+extension String {
+    public var value: Value {
+        return .string(value: self)
+    }
+}
+
+extension Int {
+    public var value: Value {
+        return .integer(value: self)
+    }
+}
+
+extension Bool {
+    public var value: Value {
+        return .bool(value: self)
     }
 }
