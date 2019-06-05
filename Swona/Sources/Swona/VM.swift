@@ -319,8 +319,8 @@ public struct EvaluationResult {
  * @see OpCode
  */
 public class Evaluator {
-    private var globalData = DataSegment()
-    private let globalTypeEnvironment = GlobalStaticEnvironment()
+    var globalData = DataSegment()
+    let globalTypeEnvironment = GlobalStaticEnvironment()
     private var globalCode = CodeSegment()
     private let functionTranslator: FunctionTranslator
     var trace = false
@@ -425,7 +425,7 @@ public class Evaluator {
         return (try translate(exp: exp), exp.type)
     }
     
-    private func translate(exp: TypedExpression) throws -> CodeSegment {
+    public func translate(exp: TypedExpression) throws -> CodeSegment {
         let optExp: TypedExpression
         if (optimize) {
             optExp = exp.optimize()
@@ -450,7 +450,7 @@ public class Evaluator {
     /**
      * Evaluates given code segment.
      */
-    private func evaluateSegment(segment: CodeSegment) throws -> Value {
+    public func evaluateSegment(segment: CodeSegment) throws -> Value {
         let (code, startAddress) = globalCode.mergeWithRelocatedSegment(segment: segment)
         let quitPointer = Value.pointer(value: -1, .code)
         
@@ -489,8 +489,8 @@ public class Evaluator {
             case let .copy(target, source, _): state[target] = state[source]
             case let .loadGlobal(target, sourceGlobal, _): state[target] = globalData[sourceGlobal]
             case let .storeGlobal(targetGlobal, source, _): globalData[targetGlobal] = state[source]
-            case let .jump(address)            : state.pc = address
-            case let .jumpIfFalse(sp, address)     :
+            case let .jump(address): state.pc = address
+            case let .jumpIfFalse(sp, address):
                 let s = state[sp]
                 guard case let .bool(value) = s else {
                     fatalError("expected bool, got \(s)")
