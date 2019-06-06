@@ -323,7 +323,7 @@ public class Evaluator {
     let globalTypeEnvironment = GlobalStaticEnvironment()
     private var globalCode = CodeSegment()
     private let functionTranslator: FunctionTranslator
-    var trace = false
+    public var trace = false
     public var optimize = true
     
     public init(trace: Bool = false) {
@@ -352,6 +352,17 @@ public class Evaluator {
         else {
             let (segment, type) = try translate(code: code)
             return EvaluationResult(value: try evaluateSegment(segment: segment), type: type)
+        }
+    }
+    
+    /**
+     * Loads contents of given file.
+     */
+    public func loadResource(source: String, file: String) throws {
+        let defs = try parseFunctionDefinitions(code: source, file: file)
+    
+        for def in defs {
+            try bindFunction(func: def)
         }
     }
     
