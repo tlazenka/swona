@@ -93,7 +93,7 @@ while true {
     }
     
     do {
-        if line.starts(with: ":dump ") {
+        if line.hasPrefix(":dump ") {
             print(try evaluator.dump(code: String(line.dropFirst(":dump ".count))))
         }
         else {
