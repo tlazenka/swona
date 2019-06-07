@@ -44,15 +44,29 @@ lineNoise.preserveHistoryEdits = true
 let evaluator = Evaluator()
 try registerRuntimeFunctions(evaluator: evaluator)
 
+lineNoise.setCompletionCallback {
+    buffer in
+    let lowercasedBuffer = buffer.lowercased()
+    return evaluator.bindingsNames().filter { $0.lowercased().hasPrefix(lowercasedBuffer) }
+}
+
 try evaluator.loadResource(file: "prelude.sk")
 
 print("Welcome to Swona, a Swift port of Siilinkari! Enjoy your stay or type 'exit' to get out.")
 
 var showElapsedTime = false
 while true {
-    guard var line = try? lineNoise.getLine(prompt: ">>> ") else {
+    var line: String
+    do {
+        line = try lineNoise.getLine(prompt: ">>> ")
+    }
+    catch LinenoiseError.CTRL_C {
+        exit(EXIT_SUCCESS)
+    }
+    catch {
         break
     }
+    print()
     if line == "" {
         continue
     }
@@ -61,7 +75,6 @@ while true {
     }
     
     lineNoise.addHistory(line)
-    print()
     
     if line == ":trace" {
         evaluator.trace = !evaluator.trace;

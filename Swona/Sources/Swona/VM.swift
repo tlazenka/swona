@@ -369,7 +369,7 @@ public class Evaluator {
     /**
      * Returns the names of all global bindings.
      */
-    func bindingsNames() -> Set<String> {
+    public func bindingsNames() -> Set<String> {
         return globalTypeEnvironment.bindingNames()
     }
     
