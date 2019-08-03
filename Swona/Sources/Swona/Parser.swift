@@ -40,21 +40,21 @@ private func parseComplete<T>(lexer: Lexer, callback: (Parser) throws -> T) thro
  */
 public class Parser {
     private let lexer: LookaheadLexer;
-    
+
     init(lexer: Lexer) {
         self.lexer = LookaheadLexer(lexer: lexer)
     }
-    
+
     func parseFunctionDefinitions() throws -> Array<FunctionDefinition> {
         var result = Array<FunctionDefinition>()
-    
+
         while (lexer.hasMore) {
             result += [try parseFunctionDefinition()]
         }
-    
+
         return result
     }
-    
+
     /**
      * ```
      * functionDefinition :== "fun" name "(" args ")" [ ":" type ] "=" expression
@@ -73,10 +73,10 @@ public class Parser {
         }
         try lexer.expect(expected: .punctuation(.equal))
         let body = try parseTopLevelExpression()
-    
+
         return FunctionDefinition(name: name, args: args, returnType: returnType, body: body)
     }
-    
+
     /**
      * Parses an expression.
      *
@@ -113,22 +113,22 @@ public class Parser {
             else {
                 return exp
             }
-            
+
         default:
             break
         }
-        
+
         return try parseExpression1()
     }
-    
+
     /**
      * ```
-     * expression1 ::= expression2 (("||") expression2)*
+     * expression1 ::= expression2 (("||") expression2)
      * ```
      */
     private func parseExpression1() throws -> Expression {
         var exp = try parseExpression2()
-        
+
         while (lexer.hasMore) {
             let location = try lexer.nextTokenLocation()
             if (try lexer.readNextIf(token: .operator(.or))) {
@@ -140,15 +140,15 @@ public class Parser {
         }
         return exp
     }
-    
+
     /**
      * ```
-     * expression2 ::= expression3 (("&&") expression2)3
+     * expression2 ::= expression3 (("&&") expression2)
      * ```
      */
     private func parseExpression2() throws -> Expression {
         var exp = try parseExpression3()
-        
+
         while (lexer.hasMore) {
             let location = try lexer.nextTokenLocation()
             if (try lexer.readNextIf(token: .operator(.and))) {
@@ -158,10 +158,10 @@ public class Parser {
                 return exp
             }
         }
-        
+
         return exp
     }
-    
+
     /**
      * ```
      * expression3 ::= expression4 (("==" | "!=") expression4)*
@@ -169,7 +169,7 @@ public class Parser {
      */
     func parseExpression3() throws -> Expression {
         var exp = try parseExpression4()
-        
+
         while (lexer.hasMore) {
             let location = try lexer.nextTokenLocation()
             if (try lexer.readNextIf(token: .operator(.equalEqual))) {
@@ -182,10 +182,10 @@ public class Parser {
                 return exp
             }
         }
-        
+
         return exp
     }
-    
+
     /**
      * ```
      * expression4 ::= expression5 (("<" | ">" | "<=" | ">=") expression5)*
@@ -193,7 +193,7 @@ public class Parser {
      */
     private func parseExpression4() throws -> Expression {
         var exp = try parseExpression5()
-        
+
         while (lexer.hasMore) {
             let location = try lexer.nextTokenLocation()
             if (try lexer.readNextIf(token: .`operator`(.lessThan))) {
@@ -212,10 +212,10 @@ public class Parser {
                 return exp
             }
         }
-        
+
         return exp
     }
-    
+
     /**
      * ```
      * expression5 ::= expression6 (("+" | "-") expression6)*
@@ -223,7 +223,7 @@ public class Parser {
      */
     private func parseExpression5() throws -> Expression {
         var exp = try parseExpression6()
-        
+
         while (lexer.hasMore) {
             let location = try lexer.nextTokenLocation()
             if (try lexer.readNextIf(token: .operator(.plus))) {
@@ -236,18 +236,18 @@ public class Parser {
                 return exp
             }
         }
-        
+
         return exp
     }
-    
+
     /**
      * ```
-     * expression6 ::= expression7 (("*" | "/") expression7)*
+     * expression6 ::= expression7 (("*" | "/") expression7)
      * ```
      */
     private func parseExpression6() throws -> Expression {
         var exp = try parseExpression7()
-        
+
         while (lexer.hasMore) {
             let location = try lexer.nextTokenLocation()
             if (try lexer.readNextIf(token: .operator(.multiply))) {
@@ -260,10 +260,10 @@ public class Parser {
                 return exp
             }
         }
-        
+
         return exp
     }
-    
+
     /**
      * ```
      * expression7 ::= expression8 [ '(' args ')']
@@ -271,7 +271,7 @@ public class Parser {
      */
     private func parseExpression7() throws -> Expression {
         let exp = try parseExpression8()
-        
+
         if try lexer.nextTokenIs(token: .punctuation(.leftParen)) {
             return Expression.call(func: exp, args: try parseArgumentList())
         }
@@ -279,7 +279,7 @@ public class Parser {
             return exp
         }
     }
-    
+
     /**
      * ```
      * expression8 ::= identifier | literal | not | "(" expression ")" | if | while
@@ -318,14 +318,14 @@ public class Parser {
         }
         throw fail(location: tokenInfo.location, message: "unexpected token \(tokenInfo.token.description)")
     }
-    
+
     private func parseAssignTo(variable: String) throws -> Expression {
         let location = try lexer.expect(expected: .punctuation(.equal))
         let rhs = try parseTopLevelExpression()
-    
+
         return Expression.assign(variable: variable, expression: rhs, location: location)
     }
-    
+
     private func parseVariableDefinition() throws -> Expression {
         let mutable = try lexer.nextTokenIs(token: .keyword(.var))
         let location: SourceLocation
@@ -335,13 +335,13 @@ public class Parser {
         else {
             location = try lexer.expect(expected: .keyword(.val))
         }
-        
+
         let variable = try parseName().0
         try lexer.expect(expected: .punctuation(.equal))
         let expression = try parseTopLevelExpression()
         return Expression.`var`(variable: variable, expression: expression, mutable: mutable, location: location)
     }
-    
+
     private func parseIf() throws -> Expression {
         let location = try lexer.expect(expected: .keyword(.if))
         let condition = try inParens { try parseTopLevelExpression() }
@@ -353,19 +353,19 @@ public class Parser {
         else {
             alternative = nil
         }
-    
+
         return Expression.`if`(condition: condition, consequent: consequent, alternative: alternative, location: location)
     }
 
-    
+
     private func parseWhile() throws -> Expression {
         let location = try lexer.expect(expected: .keyword(.while))
         let condition = try inParens { try parseTopLevelExpression() }
         let body = try parseTopLevelExpression()
-        
+
         return Expression.`while`(condition: condition, body: body, location: location)
     }
-    
+
     private func parseExpressionList() throws -> Expression {
         let location = try lexer.nextTokenLocation()
         let result: [Expression] = try inBraces {
@@ -376,7 +376,7 @@ public class Parser {
                 return try separatedBy(separator: .punctuation(.semicolon)) { try parseTopLevelExpression() }
             }
         }
-        
+
         return Expression.`expressionList`(expressions: result, location: location)
     }
 
@@ -387,20 +387,20 @@ public class Parser {
         }
         return Expression.lit(value: value, location: tokenInfo.location)
     }
-    
+
     private func parseNot() throws -> Expression {
         let location = try lexer.expect(expected: .operator(.not))
         let exp = try parseExpression7()
-    
+
         return Expression.not(exp: exp, location: location)
     }
-    
+
     private func parseIdentifier() throws -> Expression {
         let (name, location) = try parseName()
-    
+
         return Expression.ref(name: name, location: location)
     }
-    
+
     private func parseArgumentList() throws -> Array<Expression>  {
         return try inParens {
             if (try lexer.nextTokenIs(token: .punctuation(.rightParen))) {
@@ -415,7 +415,7 @@ public class Parser {
             }
         }
     }
-    
+
     private func parseArgumentDefinitionList() throws -> Array<(String, Type)> {
         return try inParens {
             if (try lexer.nextTokenIs(token: .punctuation(.rightParen))) {
@@ -433,7 +433,7 @@ public class Parser {
             }
         }
     }
-    
+
     private func parseName() throws -> (String, SourceLocation) {
         let tokenInfo = try lexer.readToken()
         guard case let Token.identifier(name) = tokenInfo.token else {
@@ -441,7 +441,7 @@ public class Parser {
         }
         return (name, tokenInfo.location)
     }
-    
+
     private func parseType() throws -> Type {
         let tokenInfo = try lexer.readToken()
         guard case let Token.identifier(name) = tokenInfo.token else {
@@ -460,40 +460,40 @@ public class Parser {
             throw fail(location: tokenInfo.location, message: "unknown type name: '\(name)'")
         }
     }
-    
+
     private func inParens<T>(parser: () throws -> T) throws -> T {
         return try between(left: .punctuation(.leftParen), right: .punctuation(.rightParen), parser: parser)
     }
-    
+
     private func inBraces<T>(parser: () throws -> T) throws -> T {
         return try between(left: .punctuation(.leftBrace), right: .punctuation(.rightBrace), parser: parser)
     }
-    
+
     private func between<T>(left: Token, right: Token, parser: () throws -> T) throws -> T {
         try lexer.expect(expected: left)
         let value = try parser()
         try lexer.expect(expected: right)
         return value
     }
-    
+
     private func separatedBy<T> (separator: Token, parser: () throws -> T) throws -> Array<T> {
         var result = Array<T>()
-        
+
         repeat {
             try result.append(parser())
         } while (try lexer.readNextIf(token: separator))
-        
+
         return result
     }
-    
+
     private func fail(message: String) -> SyntaxErrorException {
         return fail(location: self.lexer.currentSourceLocation, message: message)
     }
-    
+
     private func fail(location: SourceLocation, message: String) -> SyntaxErrorException {
         return SyntaxErrorException(errorMessage: message, sourceLocation: location)
     }
-    
+
     func expectEnd() throws {
         if (lexer.hasMore) {
             let tokenInfo = try lexer.peekToken()
