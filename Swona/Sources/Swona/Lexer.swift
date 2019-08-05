@@ -309,6 +309,8 @@ public class Lexer {
             return .keyword(.fun)
         case "if":
             return .keyword(.if)
+        case "unless":
+            return .keyword(.unless)
         case "var":
             return .keyword(.var)
         case "val":
