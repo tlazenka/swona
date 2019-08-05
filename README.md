@@ -24,6 +24,15 @@ More in the [Prelude](Resources/prelude.sk).
 
 `docker-compose run --rm tests`
 
+## Requirements for development
+
+https://github.com/krzysztofzablocki/Sourcery
+
+After install from the root run:
+
+```cd Swona && sourcery && cd - ```
+
+
 # Acknowledgements
 
 Juha Komulainen and others listed in [LICENSE-THIRD-PARTY](LICENSE-THIRD-PARTY).
