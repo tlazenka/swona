@@ -19,7 +19,7 @@ public struct SourceLocation: Equatable, CustomStringConvertible {
      * Returns single line representation of the location.
      */
     public var description: String { return "[\(file.description):\(line.description):\(column.description)]" }
-    
+
     /**
      * Returns two line representation of the location.
      */
@@ -37,12 +37,12 @@ public struct SourceLocation: Equatable, CustomStringConvertible {
  */
 open class SyntaxErrorException: Error, CustomStringConvertible {
     public let errorMessage: String, sourceLocation: SourceLocation
-    
+
     init(errorMessage: String, sourceLocation: SourceLocation) {
         self.errorMessage = errorMessage
         self.sourceLocation = sourceLocation
     }
-    
+
     public var description: String {
         return "\(errorMessage)\n\(sourceLocation.toLongString())"
     }
@@ -77,38 +77,39 @@ public enum Token: CustomStringConvertible {
      * Identifier such as variable, method or class name.
      */
     case identifier(name: String)
-    
+
     /**
      * Literal value, e.g. `42`, `"foo"`, or `true`.
      */
     case literal(value: Value)
-    
+
     /**
      * Reserved word in the language.
      */
     case keyword(Keyword)
-    
+
     /**
      * Operators.
      */
     case `operator`(Operator)
-    
+
     /**
      * General punctuation.
      */
     case punctuation(Punctuation)
-    
+
     public enum Keyword : String, CustomStringConvertible {
         case `else` = "else"
         case fun = "fun"
         case `if` = "if"
+        case `unless` = "unless"
         case `var` = "var"
         case val = "val"
         case `while` = "while"
-        
+
         public var description: String { return self.rawValue.description }
     }
-    
+
     public enum Operator : String, CaseIterable, CustomStringConvertible {
         case plus = "+"
         case minus = "-"
@@ -123,10 +124,10 @@ public enum Token: CustomStringConvertible {
         case greaterThanOrEqual = ">="
         case and = "&&"
         case or = "||"
-        
+
         public var description: String { return self.rawValue.description }
     }
-    
+
     public enum Punctuation : String, CaseIterable, CustomStringConvertible {
         case leftParen = "("
         case rightParen = ")"
@@ -136,7 +137,7 @@ public enum Token: CustomStringConvertible {
         case colon = ":"
         case semicolon = ";"
         case comma = ","
-        
+
         public var description: String { return "'\(self.rawValue.description)'" }
     }
     public var description: String {
@@ -153,7 +154,7 @@ public enum Token: CustomStringConvertible {
             return value.description
         }
     }
-    
+
 }
 
 /**
@@ -184,43 +185,43 @@ public class Lexer {
      * by skipping all whitespace after each token whenever a token is read.
      */
     private var position = 0
-    
+
     /** Current line number. Used for [SourceLocation]. */
     private var line = 1
-    
+
     /** Current column number. Used for [SourceLocation]. */
     private var column = 1
-    
+
     private let source: Array<Character>
     private let file: String
-    
+
     /** Lines of the file. Used for [SourceLocation]. */
     private let lines: Array<Substring>
-    
+
     public init(source: String, file: String = "<unknown>") throws {
         self.source = source.unicodeScalars.map { Character(UnicodeScalar($0)) }
         lines = source.lines()
         self.file = file
         try self.skipWhitespace()
     }
-    
+
     /**
      * Does the source contain more tokens?
      */
     public var hasMore: Bool {
         return position < source.count
     }
-    
+
     /**
      * Read the next [Token] from the source, along with its [SourceLocation].
      */
     public func readToken() throws -> TokenInfo {
         let location = currentSourceLocation
-        
+
         let ch = try peekChar()
-        
+
         let token: Token = try {
-            
+
             if (ch.isLetter) { return try readSymbol() }
             else if (ch.isWholeNumber) { return try readNumber() }
             else if (ch == "\"") { return try readString() }
@@ -287,12 +288,12 @@ public class Lexer {
                 throw fail(message: "unexpected character '\(ch)'")
             }
             }()
-        
+
         try skipWhitespace()
-        
+
         return TokenInfo(token: token, location: location)
     }
-    
+
     /**
      * Reads a symbol.
      *
@@ -308,6 +309,8 @@ public class Lexer {
             return .keyword(.fun)
         case "if":
             return .keyword(.if)
+        case "unless":
+            return .keyword(.unless)
         case "var":
             return .keyword(.var)
         case "val":
@@ -322,7 +325,7 @@ public class Lexer {
             return .identifier(name: str)
         }
     }
-    
+
     /**
      * Reads a number literal.
      *
@@ -333,19 +336,19 @@ public class Lexer {
         guard let value = Int(i) else {
             throw fail(message: "expected Int, but got '\(i)'")
         }
-        
+
         return .literal(value: .integer(value: value))
     }
-    
+
     /**
      * Reads a string literal.
      */
     private func readString() throws -> Token {
         var sb = [Character]()
         var escape = false
-        
+
         try expect(ch: "\"")
-        
+
         while (hasMore) {
             let ch = try readChar()
             if (escape) {
@@ -362,10 +365,10 @@ public class Lexer {
                 sb.append(ch)
             }
         }
-        
+
         throw unexpectedEnd()
     }
-    
+
     /**
      * Returns the next character in source code without consuming it.
      */
@@ -375,7 +378,7 @@ public class Lexer {
         }
         return source[position]
     }
-    
+
     /**
      * If next character is [ch], consume the character and return true.
      * Otherwise don't consume the character and return false.
@@ -389,7 +392,7 @@ public class Lexer {
             return false
         }
     }
-    
+
     /**
      * Skip characters in input as long as [predicate] returns `true`.
      */
@@ -398,7 +401,7 @@ public class Lexer {
             try readChar()
         }
     }
-    
+
     /**
      * Read characters in input as long as [predicate] returns `true`
      * and return the string of read characters.
@@ -408,7 +411,7 @@ public class Lexer {
         try skipWhile(predicate: predicate)
         return String(source).substring(startOffset: start, endOffset: position)
     }
-    
+
     /**
      * Reads a single character from source code.
      *
@@ -421,7 +424,7 @@ public class Lexer {
         }
         let ch = source[position]
         position += 1
-        
+
         if (ch == "\n") {
             line += 1
             column = 1
@@ -429,10 +432,10 @@ public class Lexer {
         else {
             column += 1
         }
-        
+
         return ch
     }
-    
+
     /**
      * Consume next character if it is [ch]. Otherwise throws [SyntaxErrorException].
      */
@@ -445,28 +448,28 @@ public class Lexer {
             throw fail(message: "expected '\(ch)', but got '\(c)'")
         }
     }
-    
+
     /**
      * Skips all whitespace.
      */
     private func skipWhitespace() throws -> Void {
         try skipWhile { $0.isWhitespace }
     }
-    
+
     /**
      * Returns current source location.
      */
     public var currentSourceLocation : SourceLocation {
         return SourceLocation(file: file, line: line, column: column, lineText: String(lines[line - 1]))
     }
-    
+
     /**
      * Throws [SyntaxErrorException] with given [message] and current [SourceLocation].
      */
     private func fail(message: String) -> SyntaxErrorException {
         return SyntaxErrorException(errorMessage: message, sourceLocation: currentSourceLocation)
     }
-    
+
     /**
      * Throws [UnexpectedEndOfInputException] with current [SourceLocation].
      */
@@ -487,18 +490,18 @@ public class Lexer {
  */
 public class LookaheadLexer {
     let lexer: Lexer
-    
+
     public init(lexer: Lexer) {
         self.lexer = lexer
     }
-    
+
     /**
      * Convenience constructor that creates the wrapped [Lexer] using given [source].
      */
     public convenience init(source: String) throws {
         self.init(lexer: try Lexer(source: source))
     }
-    
+
     /**
      * The lookahead token.
      *
@@ -508,14 +511,14 @@ public class LookaheadLexer {
      * If we are in sync with [lexer], then the lookahead is `null`,
      */
     var lookahead: TokenInfo? = nil
-    
+
     /**
      * Are there any more tokens in the input?
      */
     public var hasMore: Bool {
         return lookahead != nil || lexer.hasMore
     }
-    
+
     /**
      * Consumes and returns the next token.
      */
@@ -526,7 +529,7 @@ public class LookaheadLexer {
         self.lookahead = nil
         return lookahead
     }
-    
+
     /**
      * Returns the next token without consuming it.
      */
@@ -541,21 +544,21 @@ public class LookaheadLexer {
         self.lookahead = lookahead
         return lookahead
     }
-    
+
     /**
      * Returns the location of the next token.
      */
     func nextTokenLocation() throws -> SourceLocation {
         return try peekToken().location
     }
-    
+
     /**
      * Returns true if the next token is [token].
      */
     func nextTokenIs(token: Token) throws -> Bool {
         return try (hasMore && peekToken().token == token)
     }
-    
+
     /**
      * If the next token is [token], consume it and return `true`. Otherwise don't
      * consume the token and return `false`.
@@ -569,7 +572,7 @@ public class LookaheadLexer {
             return false
         }
     }
-    
+
     /**
      * If the next token is [expected], consume it and return its location.
      * Otherwise throw [SyntaxErrorException].
@@ -583,7 +586,7 @@ public class LookaheadLexer {
             throw SyntaxErrorException(errorMessage: "expected token \(expected.description), but got \(tokenInfo.token.description)", sourceLocation: tokenInfo.location)
         }
     }
-    
+
     public var currentSourceLocation : SourceLocation {
         return self.lexer.currentSourceLocation
     }

@@ -355,6 +355,8 @@ public func == (lhs: Token.Keyword, rhs: Token.Keyword) -> Bool {
         return true
     case (.`if`, .`if`):
         return true
+    case (.`unless`, .`unless`):
+        return true
     case (.`var`, .`var`):
         return true
     case (.val, .val):
