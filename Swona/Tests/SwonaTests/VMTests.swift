@@ -279,7 +279,7 @@ final class VMTests: XCTestCase {
         ("testIfExpressions", testIfExpressions),
         ("testIfExpressionValues", testIfExpressionValues),
         ("testUnlessExpressions", testUnlessExpressions),
-        ("testUnlessExpressionValues", testUnlessExpressions),
+        ("testUnlessExpressionValues", testUnlessExpressionValues),
         ("testBinaryExpressions", testBinaryExpressions),
         ("testIfWithoutElse", testIfWithoutElse),
         ("testWhileLoop", testWhileLoop),
