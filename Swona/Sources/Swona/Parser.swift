@@ -310,6 +310,8 @@ public class Parser {
             switch `keyword` {
             case .if:
                 return try parseIf()
+            case .unless:
+                return try parseUnless()
             case .while:
                 return try parseWhile()
             default:
@@ -355,6 +357,21 @@ public class Parser {
         }
 
         return Expression.`if`(condition: condition, consequent: consequent, alternative: alternative, location: location)
+    }
+
+    private func parseUnless() throws -> Expression {
+        let location = try lexer.expect(expected: .keyword(.unless))
+        let condition = try inParens { try parseTopLevelExpression() }
+        let consequent = try parseTopLevelExpression()
+        let alternative: Expression?
+        if try lexer.readNextIf(token: .keyword(.else)) {
+            alternative = try parseTopLevelExpression()
+        }
+        else {
+            alternative = nil
+        }
+
+        return Expression.`if`(condition: .not(exp: condition, location: location), consequent: consequent, alternative: alternative, location: location)
     }
 
 
