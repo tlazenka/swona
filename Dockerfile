@@ -1,4 +1,4 @@
-FROM swift:5.0
+FROM swift:5.1.2
 
 ENV APP_HOME /app
 WORKDIR $APP_HOME
