@@ -64,23 +64,20 @@ extension TypedExpression {
             default:
                 break
             }
-            switch self {
-            case let .binary(binary):
-                switch binary {
-                case .plus:
-                    return .binary(.plus(lhs: optLhs, rhs: optRhs, type: type))
-                case .minus:
-                    return .binary(.minus(lhs: optLhs, rhs: optRhs, type: type))
-                case .multiply:
-                    return .binary(.multiply(lhs: optLhs, rhs: optRhs, type: type))
-                case .divide:
-                    return .binary(.divide(lhs: optLhs, rhs: optRhs, type: type))
-                case .concatString:
-                    return .binary(.concatString(lhs: optLhs, rhs: optRhs))
-                case let .relational(op, _, _):
-                    return .binary(.relational(op: op, lhs: optLhs, rhs: optRhs))
-                    
-                }
+            switch binary {
+            case .plus:
+                return .binary(.plus(lhs: optLhs, rhs: optRhs, type: type))
+            case .minus:
+                return .binary(.minus(lhs: optLhs, rhs: optRhs, type: type))
+            case .multiply:
+                return .binary(.multiply(lhs: optLhs, rhs: optRhs, type: type))
+            case .divide:
+                return .binary(.divide(lhs: optLhs, rhs: optRhs, type: type))
+            case .concatString:
+                return .binary(.concatString(lhs: optLhs, rhs: optRhs))
+            case let .relational(op, _, _):
+                return .binary(.relational(op: op, lhs: optLhs, rhs: optRhs))
+                
             }
         case let .assign(variable, expression):
             return .assign(variable: variable, expression: expression.eval(env: env))

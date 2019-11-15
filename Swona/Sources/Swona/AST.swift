@@ -115,6 +115,10 @@ public indirect enum Expression: CustomStringConvertible {
             return location
         case let .ref(_, location):
             return location
+        case .var(_, _, _, let location):
+            return location
+        case .while(_, _, let location):
+            return location
         }
     }
     
