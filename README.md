@@ -1,6 +1,6 @@
 # Swona
 
-A Swift port of the lovely [Siilinkari](https://github.com/komu/siilinkari). Swona is a teeny language and compiler in pure Swift (excluding Foundation and XCTest for the tests, and [Linenoise-Swift](https://github.com/andybest/linenoise-swift) for the REPL).
+A Swift port of the lovely [Siilinkari](https://github.com/komu/siilinkari).
 
 ## Launch the REPL
 

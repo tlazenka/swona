@@ -1,0 +1,23 @@
+name: Swift
+
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  build:
+
+    runs-on: macos-latest
+    env:
+      working_directory: ./Swona
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build
+      run: swift build -v
+      working-directory: ${{env.working_directory}}
+    - name: Run tests
+      run: swift test -v
+      working-directory: ${{env.working_directory}}
