@@ -89,7 +89,7 @@ extension TypedExpression {
             return .var(variable: variable, expression: value)
         case let .if(condition, consequent, alternative, type):
             let optCondition = condition.eval(env: env)
-            if case let .lit(optCondition) = optCondition, case let .bool(value) = optCondition.value {
+            if case let .lit(optConditionValue, _) = optCondition, case let .bool(value) = optConditionValue {
                 if (value) {
                     return consequent.eval(env: env.child())
                 }
@@ -100,7 +100,7 @@ extension TypedExpression {
             return .if(condition: optCondition, consequent: consequent.eval(env: env.child()), alternative: alternative?.eval(env: env.child()), type: type);
         case let .while(condition, body):
             let optCondition = condition.eval(env: env)
-            if case let .lit(optCondition) = optCondition, case let .bool(value) = optCondition.value, value == false {
+            if case let .lit(optConditionValue, _) = optCondition, case let .bool(value) = optConditionValue, value == false {
                 return TypedExpression.empty
             }
             return .while(condition: optCondition, body: body.eval(env: env.child()))
@@ -244,7 +244,7 @@ private struct RedundantLoadStoreOptimizer : PeepholeOptimizer {
         let first = window[0]
         let second = window[1]
         
-        if case let .localFrameIR(localIR1) = first, case let .loadLocal(l1) = localIR1, case let .localFrameIR(localIR2) = second, case let .storeLocal(l2) = localIR2, l1.index == l2.index {
+        if case let .localFrameIR(localIR1) = first, case let .loadLocal(l1Index, _) = localIR1, case let .localFrameIR(localIR2) = second, case let .storeLocal(l2Index, _) = localIR2, l1Index == l2Index {
             return []
         }
         else {
@@ -263,7 +263,7 @@ private struct RedundantLoadOptimizer : PeepholeOptimizer {
         let first = window[0]
         let second = window[1]
         
-        if case let .localFrameIR(localIR1) = first, case let .storeLocal(l1) = localIR1, case let .localFrameIR(localIR2) = second, case let .loadLocal(l2) = localIR2, l1.index == l2.index {
+        if case let .localFrameIR(localIR1) = first, case let .storeLocal(l1Index, _) = localIR1, case let .localFrameIR(localIR2) = second, case let .loadLocal(l2Index, _) = localIR2, l1Index == l2Index {
             return [IR.dup, first]
         }
         else {

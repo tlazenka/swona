@@ -387,7 +387,7 @@ public class Evaluator {
             switch function {
             case let .compound(address, codeSize, _, _):
                 return globalCode.getRegion(address: address, size: codeSize).description
-            case .native(_):
+            case .native(_, _, _):
                 return "native function \(value)"
             }
         }
@@ -543,9 +543,9 @@ public class Evaluator {
         case let .compound(address, _, _, _):
             state[argumentCount] = Value.pointer(value: state.pc, .code)
             state.pc = address
-        case let .native(`func`):
+        case let .native(`func`, _, _):
             let args = state.getArgs(count: argumentCount)
-            state[0] = try `func`.func.function(args)
+            state[0] = try `func`.function(args)
         }
         
     }
