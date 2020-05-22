@@ -1,7 +1,7 @@
 /**
  * Represents the types supported in the language.
  */
-public indirect enum Type: CustomStringConvertible {
+public indirect enum Type: Equatable, CustomStringConvertible {
     case string
     case int
     case boolean
@@ -9,7 +9,7 @@ public indirect enum Type: CustomStringConvertible {
     case function(Function)
     case array(elementType: Type)
     
-    public enum Function {
+    public enum Function: Equatable {
         case function(argumentTypes: [Type], returnType: Type)
     }
     
