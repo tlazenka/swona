@@ -3,7 +3,7 @@
  * but leaves things like addresses and labels still abstract.
  */
 
-public enum IR: CustomStringConvertible {
+public enum IR: Equatable, CustomStringConvertible {
     case not
     case add
     case subtract
@@ -25,7 +25,7 @@ public enum IR: CustomStringConvertible {
     case storeGlobal(index: Int, name: String)
     case localFrameIR(LocalFrameIR)
     
-    public enum LocalFrameIR: CustomStringConvertible {
+    public enum LocalFrameIR: Equatable, CustomStringConvertible {
         case loadLocal(index: Int, name: String)
         case storeLocal(index: Int, name: String)
         

@@ -6,7 +6,7 @@
  * Kotlin values we are actually planning to support and the compiler could not
  * help us with exhaustiveness checks. Therefore we'll model our values explicitly.
  */
-public enum Value: CustomStringConvertible {
+public enum Value: Equatable, CustomStringConvertible {
     /**
      * Unit value.
      */
@@ -29,7 +29,7 @@ public enum Value: CustomStringConvertible {
     
     case function(Function)
     
-    public enum Function {
+    public enum Function: Equatable {
         /**
          * Function whose implementation is byte-code.
          */

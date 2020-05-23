@@ -72,7 +72,7 @@ public class UnexpectedEndOfInputException: SyntaxErrorException {
  *
  * @see TokenInfo
  */
-public enum Token: CustomStringConvertible {
+public enum Token: Equatable, CustomStringConvertible {
     /**
      * Identifier such as variable, method or class name.
      */
