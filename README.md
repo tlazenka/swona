@@ -30,22 +30,11 @@ More in the [Prelude](Resources/prelude.sk).
 
 ## Run the tests
 
-`cd Swona && swift test && cd -`
+`swift test`
 
 _or_
 
 `docker-compose run --rm tests`
-
-## Development
-
-If you would like to use Xcode for development, you can generate project files via:
-
-`cd Swona && swift package generate-xcodeproj && cd -`
-
-and
-
-`cd Repl && swift package generate-xcodeproj && cd -`
-
 
 # Acknowledgements
 
