@@ -1,5 +1,4 @@
 import XCTest
-import class Foundation.Bundle
 @testable import Swona
 
 final class HelpersTests: XCTestCase {

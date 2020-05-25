@@ -79,3 +79,47 @@ func bridgeSourceLocation(file: String = #file) -> SourceLocation {
     return SourceLocation(file: file, line: 0, column: 0, lineText: "")
 }
 
+extension Value.Function {
+    public func callAsFunction(_ values: Value...) -> Any {
+        switch self {
+        case .compound:
+            fatalError("Cannot call compound function")
+        case let .native(`func`, _, _):
+            guard let result = try? `func`.function(values) else {
+                fatalError("Could not evaluate function")
+            }
+            return result
+        }
+    }
+}
+
+extension Value: ExpressibleByStringLiteral {
+    public init(stringLiteral value: String) {
+        self = .string(value: value)
+    }
+}
+
+extension Value: ExpressibleByIntegerLiteral {
+    public init(integerLiteral value: Int) {
+        self = .integer(value: value)
+    }
+}
+
+extension Value: ExpressibleByBooleanLiteral {
+    public init(booleanLiteral value: Bool) {
+        self = .bool(value: value)
+    }
+}
+
+extension Value: ExpressibleByArrayLiteral {
+    public init(arrayLiteral elements: Value...) {
+        let types = Set(elements.map { $0.type })
+        
+        guard let type = types.first, types.count == 1 else {
+            fatalError("Only arrays of a single type are supported")
+        }
+        
+        self = .array(elements: .init(array: elements), elementType: type)
+    }
+}
+

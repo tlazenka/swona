@@ -1,6 +1,5 @@
 import XCTest
-import class Foundation.Bundle
-import Swona
+@testable import Swona
 
 final class BridgeTests: XCTestCase {
     func testBridge() throws {
@@ -47,8 +46,34 @@ final class BridgeTests: XCTestCase {
         XCTAssertEqual(result, "element0".value)
     }
     
+    func testCallAsFunction() throws {
+        let inc = fun1(name: "inc", argType: .int, returnType: .int, func: {
+            (arg) in
+            guard case let .integer(value) = arg else {
+                fatalError("Expected int arg, got \(arg)")
+            }
+            
+            return .integer(value: value + 1)
+        })
+
+        let result = inc(1)
+        XCTAssertEqual(result as? Value, Value(integerLiteral: 2))
+    }
+    
+    func testValueArray() throws {
+        let array: Value = ["item1", "item2", "item3"]
+        guard case let .array(elements, elementType) = array, elementType == .string else {
+            XCTFail("Invalid value array")
+            return
+        }
+        
+        XCTAssertEqual(elements.array, ["item1".value, "item2".value, "item3".value])
+    }
+    
     static var allTests = [
         ("testBridge", testBridge),
         ("testBridgedRuntimeFunctions", testBridgedRuntimeFunctions),
+        ("testCallAsFunction", testCallAsFunction),
+        ("testValueArray", testValueArray),
     ]
 }

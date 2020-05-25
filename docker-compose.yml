@@ -15,5 +15,5 @@ services:
         dockerfile: Dockerfile
     volumes:
       - .:/app
-    working_dir: /app/Swona
+    working_dir: /app
     command: swift test

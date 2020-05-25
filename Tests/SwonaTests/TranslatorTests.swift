@@ -1,5 +1,4 @@
 import XCTest
-import class Foundation.Bundle
 import Swona
 
 final class TranslatorTests: XCTestCase {
