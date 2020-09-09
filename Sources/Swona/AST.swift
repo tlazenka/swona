@@ -14,41 +14,41 @@
 public indirect enum Expression: CustomStringConvertible {
     /** Reference to a variable. */
     case ref(name: String, location: SourceLocation)
-    
+
     /** Literal value. */
     case lit(value: Value, location: SourceLocation)
-    
+
     /** Logical not. */
     case not(exp: Expression, location: SourceLocation)
-    
+
     /** Function call. */
-    case call(func: Expression, args: Array<Expression>)
-    
+    case call(func: Expression, args: [Expression])
+
     case binary(Binary)
-    
+
     /** Binary operators. */
     public enum Binary: CustomStringConvertible {
         /** lhs + rhs */
         case plus(lhs: Expression, rhs: Expression, location: SourceLocation)
-        
+
         /** lhs - rhs */
         case minus(lhs: Expression, rhs: Expression, location: SourceLocation)
-        
+
         /** lhs * rhs */
         case multiply(lhs: Expression, rhs: Expression, location: SourceLocation)
-        
+
         /** lhs / rhs */
         case divide(lhs: Expression, rhs: Expression, location: SourceLocation)
-        
+
         /** lhs && rhs */
         case and(lhs: Expression, rhs: Expression, location: SourceLocation)
-        
+
         /** lhs || rhs */
         case or(lhs: Expression, rhs: Expression, location: SourceLocation)
-        
+
         /** =, !=, <, >, <=, >= */
         case relational(op: RelationalOp, lhs: Expression, rhs: Expression, location: SourceLocation)
-        
+
         public var location: SourceLocation {
             switch self {
             case let .plus(_, _, location),
@@ -61,7 +61,7 @@ public indirect enum Expression: CustomStringConvertible {
                 return location
             }
         }
-        
+
         public var description: String {
             switch self {
             case let .plus(lhs, rhs, _):
@@ -81,22 +81,22 @@ public indirect enum Expression: CustomStringConvertible {
             }
         }
     }
-    
+
     /** Assignment to a variable. */
     case assign(variable: String, expression: Expression, location: SourceLocation)
-    
+
     /** Definition of a variable. */
     case `var`(variable: String, expression: Expression, mutable: Bool, location: SourceLocation)
-    
+
     /** If-statement with optional else clause. */
     case `if`(condition: Expression, consequent: Expression, alternative: Expression?, location: SourceLocation)
-    
+
     /** While-statement. */
     case `while`(condition: Expression, body: Expression, location: SourceLocation)
-    
+
     /** List of statements */
-    case `expressionList`(expressions: [Expression], location: SourceLocation)
-    
+    case expressionList(expressions: [Expression], location: SourceLocation)
+
     public var location: SourceLocation {
         switch self {
         case let .assign(_, _, location):
@@ -115,13 +115,13 @@ public indirect enum Expression: CustomStringConvertible {
             return location
         case let .ref(_, location):
             return location
-        case .var(_, _, _, let location):
+        case let .var(_, _, _, location):
             return location
-        case .while(_, _, let location):
+        case let .while(_, _, location):
             return location
         }
     }
-    
+
     public var description: String {
         switch self {
         case let .ref(name, _):
@@ -134,24 +134,23 @@ public indirect enum Expression: CustomStringConvertible {
             return "[Call \(`func`.description) \(args.description)]"
         case let .assign(variable, expression, _):
             return "[Assign \(variable.description) \(expression.description)]"
-        case let .`if`(condition, consequent, alternative, _):
+        case let .if(condition, consequent, alternative, _):
             return "[If \(condition) \(consequent) \(alternative?.description ?? "[]")]"
-        case let .`while`(condition, body, _):
+        case let .while(condition, body, _):
             return "[While \(condition) \(body)]"
-        case let .`expressionList`(expressions, _):
+        case let .expressionList(expressions, _):
             return "[ExpressionList \(expressions)]"
-        case let .`var`(variable, expression, mutable, _):
-            return "[\((mutable) ? "Var" : "Val") \(variable) \(expression)]"
+        case let .var(variable, expression, mutable, _):
+            return "[\(mutable ? "Var" : "Val") \(variable) \(expression)]"
         case let .binary(value):
             return value.description
         }
     }
-    
 }
 
 public struct FunctionDefinition: CustomStringConvertible {
     let name: String
-    let args: Array<(String, Type)>
+    let args: [(String, Type)]
     let returnType: Type?
     let body: Expression
 
@@ -159,7 +158,6 @@ public struct FunctionDefinition: CustomStringConvertible {
         let argsDescription = args.map { "(\($0.0), \($0.1))" }.joined(separator: ", ")
         return "FunctionDefinition(name=\(name), args=[\(argsDescription)], returnType=\(returnType?.description ?? "null"), body=\(body.description))"
     }
-    
 }
 
 public enum RelationalOp: String, CustomStringConvertible {
@@ -169,8 +167,6 @@ public enum RelationalOp: String, CustomStringConvertible {
     case lessThanOrEqual = "<="
     case greaterThan = ">"
     case greaterThanOrEqual = ">="
-    
-    public var description: String { return self.rawValue }
+
+    public var description: String { rawValue }
 }
-
-

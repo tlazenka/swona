@@ -10,7 +10,7 @@ public enum Binding: CustomStringConvertible {
     case global(name: String, type: Type, index: Int, mutable: Bool)
     case local(name: String, type: Type, index: Int, mutable: Bool)
     case argument(name: String, type: Type, index: Int)
-    
+
     public var index: Int {
         switch self {
         case let .global(_, _, index, _),
@@ -19,7 +19,7 @@ public enum Binding: CustomStringConvertible {
             return index
         }
     }
-    
+
     public var mutable: Bool {
         switch self {
         case let .global(_, _, _, mutable),
@@ -29,7 +29,7 @@ public enum Binding: CustomStringConvertible {
             return false
         }
     }
-    
+
     public var description: String {
         switch self {
         case let .global(name, _, index, _):
@@ -40,7 +40,7 @@ public enum Binding: CustomStringConvertible {
             return "[Argument \(index) (\(name))]"
         }
     }
-    
+
     public var name: String {
         switch self {
         case let .global(name, _, _, _),
@@ -49,8 +49,8 @@ public enum Binding: CustomStringConvertible {
             return name
         }
     }
-    
-    public var type : Type {
+
+    public var type: Type {
         switch self {
         case let .argument(_, type, _),
              let .global(_, type, _, _),
@@ -62,23 +62,23 @@ public enum Binding: CustomStringConvertible {
 
 public class BindingReference: Hashable, CustomStringConvertible {
     public static func == (lhs: BindingReference, rhs: BindingReference) -> Bool {
-        return ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
+        ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
     }
-    
+
     public func hash(into hasher: inout Hasher) {
         hasher.combine(ObjectIdentifier(self).hashValue)
     }
-    
+
     let binding: Binding
-    
+
     init(binding: Binding) {
         self.binding = binding
     }
-    
-    public var type: Type { return binding.type }
-    public var name: String { return binding.name }
-    public var description: String { return binding.description }
-    public var mutable: Bool { return binding.mutable }
+
+    public var type: Type { binding.type }
+    public var name: String { binding.name }
+    public var description: String { binding.description }
+    public var mutable: Bool { binding.mutable }
 }
 
 /**
@@ -90,7 +90,7 @@ struct VariableAlreadyBoundException: Error {
     let message: String
 
     init(name: String) {
-        self.message = "variable already bound: \(name)"
+        message = "variable already bound: \(name)"
     }
 }
 
@@ -98,16 +98,15 @@ struct VariableAlreadyBoundException: Error {
  * Mapping from variable names to [Binding]s.
  */
 public protocol StaticEnvironment: AnyObject {
-    
     var parent: StaticEnvironment? { get }
-    
-    var bindings: Dictionary<String, BindingReference> { get set }
-    
+
+    var bindings: [String: BindingReference] { get set }
+
     /**
      * Create a new binding to be installed in this environment.
      */
     func newBinding(name: String, type: Type, mutable: Bool) -> BindingReference
-    
+
     /**
      * Returns a new child scope for current environment.
      *
@@ -123,11 +122,9 @@ extension StaticEnvironment {
      * Returns the binding of given variable.
      */
     subscript(name: String) -> BindingReference? {
-        get {
-            return bindings[name] ?? parent?[name]
-        }
+        bindings[name] ?? parent?[name]
     }
-    
+
     /**
      * Create a new binding for variable having given [name] and [type].
      * For global environment, this creates a new entry in the global mappings.
@@ -139,24 +136,22 @@ extension StaticEnvironment {
         if bindings.keys.contains(name) {
             throw VariableAlreadyBoundException(name: name)
         }
-        
+
         let binding = newBinding(name: name, type: type, mutable: mutable)
         bindings[name] = binding
         return binding
     }
-    
+
     /**
      * Removes this binding from global environment, allowing it to be reused.
      */
     func unbind(name: String) {
         bindings.removeValue(forKey: name)
     }
-    
-    
+
     func bindingNames() -> Set<String> {
-        return Set(bindings.keys)
+        Set(bindings.keys)
     }
-    
 }
 
 /**
@@ -164,28 +159,26 @@ extension StaticEnvironment {
  */
 public class GlobalStaticEnvironment: StaticEnvironment {
     private var bindingIndexSequence = 0
-    
-    public var parent: StaticEnvironment? { return nil }
-    
-    public var bindings: Dictionary<String, BindingReference> = [:]
-    
-    public init() {
-    }
-    
+
+    public var parent: StaticEnvironment? { nil }
+
+    public var bindings: [String: BindingReference] = [:]
+
+    public init() {}
+
     public func newBinding(name: String, type: Type, mutable: Bool) -> BindingReference {
         let result = BindingReference(binding: Binding.global(name: name, type: type, index: bindingIndexSequence, mutable: mutable))
         bindingIndexSequence += 1
         return result
     }
-    
+
     public func newScope() -> StaticEnvironment {
-        return LocalFrameEnvironment(parent: self)
+        LocalFrameEnvironment(parent: self)
     }
-    
-    public func newScope(args: Array<(String, Type)>) -> StaticEnvironment {
-        return LocalFrameEnvironment(parent: self, args: args)
+
+    public func newScope(args: [(String, Type)]) -> StaticEnvironment {
+        LocalFrameEnvironment(parent: self, args: args)
     }
-    
 }
 
 /**
@@ -196,34 +189,32 @@ public class GlobalStaticEnvironment: StaticEnvironment {
  */
 class LocalFrameEnvironment: StaticEnvironment {
     var parent: StaticEnvironment?
-    
-    var bindings: Dictionary<String, BindingReference> = [:]
-    
+
+    var bindings: [String: BindingReference] = [:]
+
     private var bindingIndexSequence = 0
-    
+
     init(parent: StaticEnvironment) {
         self.parent = parent
     }
-    
-    init(parent: StaticEnvironment, args: Array<(String, Type)>) {
+
+    init(parent: StaticEnvironment, args: [(String, Type)]) {
         self.parent = parent
         args.enumerated().forEach { index, pair in
             let (name, type) = pair
             bindings[name] = BindingReference(binding: Binding.argument(name: name, type: type, index: index))
         }
-        
     }
-    
+
     func newBinding(name: String, type: Type, mutable: Bool) -> BindingReference {
         let result = BindingReference(binding: Binding.local(name: name, type: type, index: bindingIndexSequence, mutable: mutable))
         bindingIndexSequence += 1
         return result
     }
-    
+
     func newScope() -> StaticEnvironment {
-        return LocalFrameChildScope(parent: self, frame: self)
+        LocalFrameChildScope(parent: self, frame: self)
     }
-    
 }
 
 /**
@@ -232,23 +223,21 @@ class LocalFrameEnvironment: StaticEnvironment {
  */
 class LocalFrameChildScope: StaticEnvironment {
     var parent: StaticEnvironment?
-    
-    var bindings: Dictionary<String, BindingReference> = [:]
-    
+
+    var bindings: [String: BindingReference] = [:]
+
     var frame: LocalFrameEnvironment
-    
+
     init(parent: StaticEnvironment, frame: LocalFrameEnvironment) {
         self.parent = parent
         self.frame = frame
     }
-    
-    func newBinding(name: String, type: Type, mutable: Bool) -> BindingReference {
-        return frame.newBinding(name: name, type: type, mutable: mutable)
-    }
-    
-    func newScope() -> StaticEnvironment {
-        return LocalFrameChildScope(parent: self, frame: frame)
-    }
-    
-}
 
+    func newBinding(name: String, type: Type, mutable: Bool) -> BindingReference {
+        frame.newBinding(name: name, type: type, mutable: mutable)
+    }
+
+    func newScope() -> StaticEnvironment {
+        LocalFrameChildScope(parent: self, frame: frame)
+    }
+}

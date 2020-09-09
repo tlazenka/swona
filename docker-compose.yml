@@ -17,3 +17,12 @@ services:
       - .:/app
     working_dir: /app
     command: swift test
+  format:
+    build:
+        context: .
+        dockerfile: Dockerfile.swiftformat
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: swiftformat .
+

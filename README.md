@@ -38,4 +38,4 @@ _or_
 
 # Acknowledgements
 
-Juha Komulainen and others listed in [LICENSE-THIRD-PARTY](LICENSE-THIRD-PARTY).
+Juha Komulainen and others listed in the [LICENSE](LICENSE).

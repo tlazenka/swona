@@ -11,35 +11,35 @@ public enum Value: Equatable, CustomStringConvertible {
      * Unit value.
      */
     case unit
-    
+
     /**
      * Strings.
      */
     case string(value: String)
-    
+
     /**
      * Booleans.
      */
     case bool(value: Bool)
-    
+
     /**
      * Integers.
      */
     case integer(value: Int)
-    
+
     case function(Function)
-    
+
     public enum Function: Equatable {
         /**
          * Function whose implementation is byte-code.
          */
         case compound(address: Int, codeSize: Int, name: String, signature: Type.Function)
-        
+
         /**
          * Function implemented as native function.
          */
         case native(func: FunctionReference, name: String, signature: Type.Function)
-        
+
         public var signature: Type.Function {
             switch self {
             case let .compound(_, _, _, signature),
@@ -47,7 +47,7 @@ public enum Value: Equatable, CustomStringConvertible {
                 return signature
             }
         }
-        
+
         public var name: String {
             switch self {
             case let .compound(_, _, name, _),
@@ -56,14 +56,14 @@ public enum Value: Equatable, CustomStringConvertible {
             }
         }
     }
-    
+
     case array(elements: ArrayReference, elementType: Type)
-    
+
     case pointer(value: Int, Pointer)
     public enum Pointer {
         case code
     }
-    
+
     public func plus(rhs: Value) -> Value {
         if case let .string(lhs) = self {
             return Value.string(value: lhs + rhs.description)
@@ -73,28 +73,28 @@ public enum Value: Equatable, CustomStringConvertible {
         }
         fatalError("operation 'plus' invalid for \(self) and \(rhs)")
     }
-    
+
     public func minus(rhs: Value) -> Value {
         if case let .integer(lhs) = self, case let .integer(rhs) = rhs {
             return .integer(value: lhs - rhs)
         }
         fatalError("operation 'minus' invalid for \(self) and \(rhs)")
     }
-    
+
     public func times(rhs: Value) -> Value {
         if case let .integer(lhs) = self, case let .integer(rhs) = rhs {
             return .integer(value: lhs * rhs)
         }
         fatalError("operation 'times' invalid for \(self) and \(rhs)")
     }
-    
+
     public func div(rhs: Value) -> Value {
         if case let .integer(lhs) = self, case let .integer(rhs) = rhs {
             return .integer(value: lhs / rhs)
         }
         fatalError("operation 'div' invalid for \(self) and \(rhs)")
     }
-    
+
     /**
      * Returns a string representation of this value that is similar
      * to the syntax used in source code. Used when printing AST and
@@ -105,10 +105,10 @@ public enum Value: Equatable, CustomStringConvertible {
         case let .string(value):
             return "\"" + value.split(separator: "\"").joined(separator: "\\\"") + "\""
         default:
-            return self.description
+            return description
         }
     }
-    
+
     /**
      * Returns the [Type] associated with this value.
      */
@@ -116,21 +116,21 @@ public enum Value: Equatable, CustomStringConvertible {
         switch self {
         case .unit:
             return Type.unit
-        case .bool(_):
+        case .bool:
             return Type.boolean
-        case .integer(_):
+        case .integer:
             return Type.int
-        case .string(_):
+        case .string:
             return Type.string
         case let .function(function):
             return Type.function(function.signature)
         case let .array(_, elementType):
             return Type.array(elementType: elementType)
-        case .pointer(_, _):
+        case .pointer:
             fatalError("pointers are internal objects that have no visible type")
         }
     }
-    
+
     /** Are values of this type subject to constant propagation? */
     public var mayInline: Bool {
         switch self {
@@ -140,7 +140,7 @@ public enum Value: Equatable, CustomStringConvertible {
             return true
         }
     }
-    
+
     public func lessThan(r: Value) -> Bool {
         switch (self, r) {
         case let (.string(lhs), .string(rhs)):
@@ -153,7 +153,7 @@ public enum Value: Equatable, CustomStringConvertible {
             fatalError("< not supported for \(self) and \(r)")
         }
     }
-    
+
     public var description: String {
         switch self {
         case .unit:
@@ -167,10 +167,10 @@ public enum Value: Equatable, CustomStringConvertible {
         case let .function(function):
             switch function.signature {
             case let .function(argumentTypes, returnType):
-                return "fun \(function.name)(\(argumentTypes.map { $0.description }.joined(separator: ", "))): \(returnType)"
+                return "fun \(function.name)(\(argumentTypes.map(\.description).joined(separator: ", "))): \(returnType)"
             }
         case let .array(elements, _):
-            return "[\(elements.array.map { $0.description }.joined(separator: ", "))]"
+            return "[\(elements.array.map(\.description).joined(separator: ", "))]"
         case let .pointer(value, _):
             return "Pointer.Code(\(value.description))"
         }
@@ -179,32 +179,32 @@ public enum Value: Equatable, CustomStringConvertible {
 
 public class ArrayReference: Hashable {
     public static func == (lhs: ArrayReference, rhs: ArrayReference) -> Bool {
-        return ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
+        ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
     }
-    
+
     public func hash(into hasher: inout Hasher) {
         hasher.combine(ObjectIdentifier(self).hashValue)
     }
-    
-    internal(set) public var array: Array<Value>
-    
-    init(array: Array<Value>) {
+
+    public internal(set) var array: [Value]
+
+    init(array: [Value]) {
         self.array = array
     }
 }
 
 public class FunctionReference: Hashable {
     public static func == (lhs: FunctionReference, rhs: FunctionReference) -> Bool {
-        return ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
+        ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
     }
-    
+
     public func hash(into hasher: inout Hasher) {
         hasher.combine(ObjectIdentifier(self).hashValue)
     }
-    
-    let function: (Array<Value>) throws -> Value
-    
-    init(function: @escaping (Array<Value>) throws -> Value) {
+
+    let function: ([Value]) throws -> Value
+
+    init(function: @escaping ([Value]) throws -> Value) {
         self.function = function
     }
 }
@@ -213,18 +213,18 @@ public class FunctionReference: Hashable {
 
 extension String {
     public var value: Value {
-        return .string(value: self)
+        .string(value: self)
     }
 }
 
 extension Int {
     public var value: Value {
-        return .integer(value: self)
+        .integer(value: self)
     }
 }
 
 extension Bool {
     public var value: Value {
-        return .bool(value: self)
+        .bool(value: self)
     }
 }

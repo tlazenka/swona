@@ -1,12 +1,12 @@
 extension TypedExpression {
     public func optimize() -> TypedExpression {
-        return evaluateConstantExpressions()
+        evaluateConstantExpressions()
     }
-    
+
     public func evaluateConstantExpressions() -> TypedExpression {
-        return eval(env: ConstantBindingEnv())
+        eval(env: ConstantBindingEnv())
     }
-    
+
     fileprivate func eval(env: ConstantBindingEnv) -> TypedExpression {
         switch self {
         case let .ref(bindingReference):
@@ -25,7 +25,7 @@ extension TypedExpression {
                 guard case let .bool(boolValue) = value else {
                     fatalError("invalid lit value: \(value.description)")
                 }
-                return .lit(value: .bool(value: !(boolValue)), type: Type.boolean)
+                return .lit(value: .bool(value: !boolValue), type: Type.boolean)
             case let .not(exp):
                 return exp
             default:
@@ -39,17 +39,17 @@ extension TypedExpression {
                 if case let .relational(op, _, _) = binary {
                     return .lit(value: Value.bool(value: op.evaluate(lhs: lvalue, rhs: rvalue)), type: .boolean)
                 }
-                if case .string = lvalue, case .concatString(_, _) = binary {
+                if case .string = lvalue, case .concatString = binary {
                     return .lit(value: lvalue.plus(rhs: rvalue), type: .string)
                 }
-                if case .integer(_) = lvalue, case let .integer(rvalueInt) = rvalue {
+                if case .integer = lvalue, case let .integer(rvalueInt) = rvalue {
                     switch binary {
                     case .plus:
                         return .lit(value: lvalue.plus(rhs: rvalue), type: .int)
                     case .minus:
                         return .lit(value: lvalue.minus(rhs: rvalue), type: .int)
                     case .divide:
-                        if (rvalueInt == 0) {
+                        if rvalueInt == 0 {
                             break
                         }
                         return .lit(value: lvalue.div(rhs: rvalue), type: .int)
@@ -59,7 +59,6 @@ extension TypedExpression {
                         #warning("Remodel")
                         fatalError("invalid operation on integers: \(binary)")
                     }
-                    
                 }
             default:
                 break
@@ -77,27 +76,25 @@ extension TypedExpression {
                 return .binary(.concatString(lhs: optLhs, rhs: optRhs))
             case let .relational(op, _, _):
                 return .binary(.relational(op: op, lhs: optLhs, rhs: optRhs))
-                
             }
         case let .assign(variable, expression):
             return .assign(variable: variable, expression: expression.eval(env: env))
         case let .var(variable, expression):
             let value = expression.eval(env: env)
-            if case let .lit(v, _) = value, v.mayInline, !(variable.mutable) {
+            if case let .lit(v, _) = value, v.mayInline, !variable.mutable {
                 env[variable] = v
             }
             return .var(variable: variable, expression: value)
         case let .if(condition, consequent, alternative, type):
             let optCondition = condition.eval(env: env)
             if case let .lit(optConditionValue, _) = optCondition, case let .bool(value) = optConditionValue {
-                if (value) {
+                if value {
                     return consequent.eval(env: env.child())
-                }
-                else {
+                } else {
                     return alternative?.eval(env: env.child()) ?? TypedExpression.empty
                 }
             }
-            return .if(condition: optCondition, consequent: consequent.eval(env: env.child()), alternative: alternative?.eval(env: env.child()), type: type);
+            return .if(condition: optCondition, consequent: consequent.eval(env: env.child()), alternative: alternative?.eval(env: env.child()), type: type)
         case let .while(condition, body):
             let optCondition = condition.eval(env: env)
             if case let .lit(optConditionValue, _) = optCondition, case let .bool(value) = optConditionValue, value == false {
@@ -112,7 +109,6 @@ extension TypedExpression {
 }
 
 extension RelationalOp {
-    
     func evaluate(lhs: Value, rhs: Value) -> Bool {
         switch self {
         case .equals:
@@ -135,25 +131,24 @@ extension RelationalOp {
  * Environment containing all constant bindings.
  */
 private class ConstantBindingEnv {
-    
     private let parent: ConstantBindingEnv?
-    
+
     init(parent: ConstantBindingEnv? = nil) {
         self.parent = parent
     }
-    
-    private var constantBindings = [BindingReference:Value]()
-    
+
+    private var constantBindings = [BindingReference: Value]()
+
     func child() -> ConstantBindingEnv {
-        return ConstantBindingEnv(parent: self)
+        ConstantBindingEnv(parent: self)
     }
-    
+
     subscript(binding: BindingReference) -> Value? {
         set(value) {
             constantBindings[binding] = value
         }
         get {
-            return constantBindings[binding] ?? parent?[binding]
+            constantBindings[binding] ?? parent?[binding]
         }
     }
 }
@@ -168,12 +163,12 @@ extension BasicBlock {
         repeat {
             modified = false
             for optimizer in optimizers {
-                if (optimizer.optimize(basicBlock: self)) {
+                if optimizer.optimize(basicBlock: self) {
                     modified = true
                 }
             }
-            
-        } while (modified)
+
+        } while modified
     }
 }
 
@@ -190,16 +185,15 @@ private let optimizers: [PeepholeOptimizer] = [
  * window of the [BasicBlock] to optimize.
  */
 private protocol PeepholeOptimizer {
-    
     var windowSize: Int { get }
-    
+
     /**
      * Try to optimize a window of IR-sequence. If the optimizer detects
      * a pattern it can optimize, it will return a list of instructions
      * replacing the instructions of the original window. Otherwise it
      * will return null.
      */
-    func optimizeWindow(window: Array<IR>) -> Array<IR>?
+    func optimizeWindow(window: [IR]) -> [IR]?
 }
 
 extension PeepholeOptimizer {
@@ -213,15 +207,15 @@ extension PeepholeOptimizer {
         precondition(windowSize > 0)
 
         var modified = false
-        
+
         var opCodes = basicBlock.opCodes
         var i = 0
         while i < opCodes.count {
             let end = i + windowSize
-            let window = opCodes[i..<min(end, opCodes.count)]
-            let left = opCodes[0..<i]
-            let right = opCodes[min(end, opCodes.count)..<opCodes.count]
-            let optimized = (window.count > 1) ? (optimizeWindow(window: Array(window))) : (nil)
+            let window = opCodes[i ..< min(end, opCodes.count)]
+            let left = opCodes[0 ..< i]
+            let right = opCodes[min(end, opCodes.count) ..< opCodes.count]
+            let optimized = (window.count > 1) ? optimizeWindow(window: Array(window)) : nil
             opCodes = Array(left) + (optimized ?? Array(window)) + right
             if optimized != nil {
                 modified = true
@@ -229,7 +223,7 @@ extension PeepholeOptimizer {
             i += 1
         }
         basicBlock.opCodes = opCodes
-        
+
         return modified
     }
 }
@@ -237,17 +231,16 @@ extension PeepholeOptimizer {
 /**
  * Loading a variable by storing to same variable is a no-op: remove instructions.
  */
-private struct RedundantLoadStoreOptimizer : PeepholeOptimizer {
-    var windowSize: Int { return 2 }
-    
-    func optimizeWindow(window: Array<IR>) -> Array<IR>? {
+private struct RedundantLoadStoreOptimizer: PeepholeOptimizer {
+    var windowSize: Int { 2 }
+
+    func optimizeWindow(window: [IR]) -> [IR]? {
         let first = window[0]
         let second = window[1]
-        
+
         if case let .localFrameIR(localIR1) = first, case let .loadLocal(l1Index, _) = localIR1, case let .localFrameIR(localIR2) = second, case let .storeLocal(l2Index, _) = localIR2, l1Index == l2Index {
             return []
-        }
-        else {
+        } else {
             return nil
         }
     }
@@ -256,40 +249,35 @@ private struct RedundantLoadStoreOptimizer : PeepholeOptimizer {
 /**
  * Storing a variable and then loading the same variable can be replaced by dup + store.
  */
-private struct RedundantLoadOptimizer : PeepholeOptimizer {
-    var windowSize: Int { return 2 }
-    
-    func optimizeWindow(window: Array<IR>) -> Array<IR>? {
+private struct RedundantLoadOptimizer: PeepholeOptimizer {
+    var windowSize: Int { 2 }
+
+    func optimizeWindow(window: [IR]) -> [IR]? {
         let first = window[0]
         let second = window[1]
-        
+
         if case let .localFrameIR(localIR1) = first, case let .storeLocal(l1Index, _) = localIR1, case let .localFrameIR(localIR2) = second, case let .loadLocal(l2Index, _) = localIR2, l1Index == l2Index {
             return [IR.dup, first]
-        }
-        else {
+        } else {
             return nil
         }
     }
-    
 }
 
 /**
  * Removes PushUnit + Pop -combinations
  */
 private struct RedundantPushUnitPopOptimizer: PeepholeOptimizer {
-    var windowSize: Int { return 2 }
-    
-    func optimizeWindow(window: Array<IR>) -> Array<IR>? {
+    var windowSize: Int { 2 }
+
+    func optimizeWindow(window: [IR]) -> [IR]? {
         let first = window[0]
         let second = window[1]
-        
+
         if case .pushUnit = first, case .pop = second {
             return []
-        }
-        else {
+        } else {
             return nil
         }
     }
 }
-
-

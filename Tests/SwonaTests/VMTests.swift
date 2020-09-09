@@ -1,5 +1,5 @@
-import XCTest
 import Swona
+import XCTest
 
 final class VMTests: XCTestCase {
     let evaluator = Evaluator(trace: false)
@@ -69,7 +69,6 @@ final class VMTests: XCTestCase {
         try assertEvaluation(code: "r", expectedValue: .integer(value: 123))
     }
 
-
     func testUnlessExpressionValues() throws {
         try evaluator.bind(name: "x", value: Value.bool(value: true))
 
@@ -101,13 +100,12 @@ final class VMTests: XCTestCase {
         try evaluator.bind(name: "b", value: .integer(value: 0))
 
         try evaluate(code: """
-                    while (x != 0) {
-                        x = x - 1;
-                        a = a + 1;
-                        b = a + b
-                    }
-    """)
-
+                        while (x != 0) {
+                            x = x - 1;
+                            a = a + 1;
+                            b = a + b
+                        }
+        """)
 
         try assertEvaluation(code: "x", expectedValue: .integer(value: 0))
         try assertEvaluation(code: "a", expectedValue: .integer(value: 5))
@@ -135,11 +133,11 @@ final class VMTests: XCTestCase {
         try evaluator.bind(name: "result", value: .integer(value: 0))
 
         try evaluate(code: """
-            if (true) {
-                var sq = square;
-                result = sq(5)
-            }
-    """)
+                if (true) {
+                    var sq = square;
+                    result = sq(5)
+                }
+        """)
 
         try assertEvaluation(code: "result", expectedValue: .integer(value: 25))
     }
@@ -150,7 +148,7 @@ final class VMTests: XCTestCase {
     }
 
     func testExpressionFunctions() throws {
-        try evaluate(code:"fun sub(x: Int, y: Int): Int = x - y")
+        try evaluate(code: "fun sub(x: Int, y: Int): Int = x - y")
         try assertEvaluation(code: "sub(7, 4)", expectedValue: .integer(value: 3))
     }
 
@@ -198,21 +196,20 @@ final class VMTests: XCTestCase {
     }
 
     func testNativeFunctionCallWithSingleParameter() throws {
+        try evaluator.bind(name: "inc", value: .function(fun1(name: "inc", argType: Type.int, returnType: Type.int) { (value: Value) -> Value in
+            value.plus(rhs: .integer(value: 1))
+        }), mutable: false)
 
-        try evaluator.bind(name: "inc",  value: .function(fun1(name: "inc", argType: Type.int, returnType: Type.int) { (value: Value) -> Value in
-            return value.plus(rhs: .integer(value: 1))}), mutable: false)
-
-        try assertEvaluation(code: "inc(4)", expectedValue:.integer(value: 5))
+        try assertEvaluation(code: "inc(4)", expectedValue: .integer(value: 5))
     }
 
     func testNativeFunctionCallWithMultipleParameters() throws {
+        try evaluator.bind(name: "sub", value: .function(fun2(name: "sub", argType: Type.int, returnType: Type.int) { (a: Value, b: Value) -> Value in
+            a.minus(rhs: b)
+        }), mutable: false)
 
-        try evaluator.bind(name: "sub",  value: .function(fun2(name: "sub", argType: Type.int, returnType: Type.int) { (a: Value, b: Value) -> Value in
-            return a.minus(rhs: b)}), mutable: false)
-
-        try assertEvaluation(code: "sub(7, 4)", expectedValue:.integer(value: 3))
+        try assertEvaluation(code: "sub(7, 4)", expectedValue: .integer(value: 3))
     }
-
 
     func testNestedIfs() throws {
         try assertEvaluation(code: "if (false) 1 else if (true) 2 else 3", expectedValue: .integer(value: 2))
@@ -220,14 +217,14 @@ final class VMTests: XCTestCase {
 
     func testRecursion() throws {
         try evaluate(code: """
-            fun fib(i: Int): Int =
-                if (i == 0)
-                    0
-                else if (i == 1)
-                    1
-                else
-                    fib(i-1) + fib(i-2)
-    """)
+                fun fib(i: Int): Int =
+                    if (i == 0)
+                        0
+                    else if (i == 1)
+                        1
+                    else
+                        fib(i-1) + fib(i-2)
+        """)
 
         try assertEvaluation(code: "fib(2)", expectedValue: .integer(value: 1))
         try assertEvaluation(code: "fib(10)", expectedValue: .integer(value: 55))
@@ -265,9 +262,8 @@ final class VMTests: XCTestCase {
     }
 
     @discardableResult private func evaluate(code: String) throws -> Value {
-        return try evaluator.evaluate(code: code).value
+        try evaluator.evaluate(code: code).value
     }
-
 
     static var allTests = [
         ("testLiteralEvaluation", testLiteralEvaluation),

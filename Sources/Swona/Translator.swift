@@ -24,25 +24,25 @@ public enum IR: Equatable, CustomStringConvertible {
     case loadArgument(index: Int, name: String)
     case storeGlobal(index: Int, name: String)
     case localFrameIR(LocalFrameIR)
-    
+
     public enum LocalFrameIR: Equatable, CustomStringConvertible {
         case loadLocal(index: Int, name: String)
         case storeLocal(index: Int, name: String)
-        
+
         public var stackDelta: Int {
             switch self {
             case .loadLocal: return 1
             case .storeLocal: return -1
             }
         }
-        
+
         public var description: String {
             switch self {
-            case let .loadLocal(index, name): return  "LoadLocal \(index) ; \(name)"
+            case let .loadLocal(index, name): return "LoadLocal \(index) ; \(name)"
             case let .storeLocal(index, name): return "StoreLocal \(index) ; \(name)"
             }
         }
-        
+
         public var localFrameOffset: Int {
             switch self {
             case let .loadLocal(index, _):
@@ -51,26 +51,25 @@ public enum IR: Equatable, CustomStringConvertible {
                 return index
             }
         }
-        
     }
 
     public var stackDelta: Int {
         switch self {
-        case .not : return 0
-        case .add : return -1
-        case .subtract : return -1
-        case .multiply : return -1
-        case .divide : return -1
-        case .equal : return -1
-        case .lessThan : return -1
-        case .lessThanOrEqual : return -1
-        case .concatString : return -1
-        case .pop : return -1
-        case .dup : return 1
+        case .not: return 0
+        case .add: return -1
+        case .subtract: return -1
+        case .multiply: return -1
+        case .divide: return -1
+        case .equal: return -1
+        case .lessThan: return -1
+        case .lessThanOrEqual: return -1
+        case .concatString: return -1
+        case .pop: return -1
+        case .dup: return 1
         case let .call(argumentCount): return -argumentCount
-        case .restoreFrame : return 0
-        case .ret : return -1
-        case .pushUnit : return 1
+        case .restoreFrame: return 0
+        case .ret: return -1
+        case .pushUnit: return 1
         case .push: return 1
         case .loadGlobal: return 1
         case .loadArgument: return 1
@@ -78,7 +77,7 @@ public enum IR: Equatable, CustomStringConvertible {
         case let .localFrameIR(localFrameIR): return localFrameIR.stackDelta
         }
     }
-    
+
     public var description: String {
         switch self {
         case .not: return "Not"
@@ -92,7 +91,7 @@ public enum IR: Equatable, CustomStringConvertible {
         case .concatString: return "ConcatString"
         case .pop: return "Pop"
         case .dup: return "Dup"
-        case .call(_): return "Call"
+        case .call: return "Call"
         case .restoreFrame: return "RestoreFrame"
         case .ret: return "Ret"
         case .pushUnit: return "PushUnit"
@@ -103,7 +102,6 @@ public enum IR: Equatable, CustomStringConvertible {
         case let .localFrameIR(localFrameIR): return localFrameIR.description
         }
     }
-    
 }
 
 /**
@@ -111,21 +109,20 @@ public enum IR: Equatable, CustomStringConvertible {
  */
 public class BasicBlock: CustomStringConvertible, Hashable {
     public static func == (lhs: BasicBlock, rhs: BasicBlock) -> Bool {
-        return ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
+        ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
     }
-    
+
     public var opCodes = [IR]()
-    
-    var next: BlockEnd = BlockEnd.none
-    
-    public init() {
-    }
-    
+
+    var next = BlockEnd.none
+
+    public init() {}
+
     /** How executing this blocks affects the depth of the stack */
     public var stackDelta: Int {
-        return opCodes.sumBy { $0.stackDelta } + next.stackDelta
+        opCodes.sumBy { $0.stackDelta } + next.stackDelta
     }
-    
+
     public var maxLocalVariableOffset: Int {
         let p: [Int?] = opCodes.map {
             switch $0 {
@@ -136,14 +133,13 @@ public class BasicBlock: CustomStringConvertible, Hashable {
             }
         }
         return p.compactMap { $0 }.max() ?? -1
-        
     }
-    
+
     public indirect enum BlockEnd: CustomStringConvertible {
         case none
         case jump(basicBlock: BasicBlock)
         case branch(trueBlock: BasicBlock, falseBlock: BasicBlock)
-        
+
         var stackDelta: Int {
             switch self {
             case .none:
@@ -154,7 +150,7 @@ public class BasicBlock: CustomStringConvertible, Hashable {
                 return -1
             }
         }
-     
+
         public var description: String {
             switch self {
             case .none:
@@ -165,7 +161,7 @@ public class BasicBlock: CustomStringConvertible, Hashable {
                 return "Branch"
             }
         }
-        
+
         public var blocks: [BasicBlock] {
             switch self {
             case .none:
@@ -176,38 +172,37 @@ public class BasicBlock: CustomStringConvertible, Hashable {
                 return [trueBlock, falseBlock]
             }
         }
-
     }
-    
+
     /**
      * Adds a new opcode.
      */
     func plusAssign(op: IR) {
         opCodes += [op]
     }
-    
-    public static func +=(left: BasicBlock, right: IR) {
+
+    public static func += (left: BasicBlock, right: IR) {
         left.plusAssign(op: right)
     }
-    
+
     func endWithJumpTo(next: BasicBlock) {
         guard case .none = self.next else {
             fatalError()
         }
         self.next = BlockEnd.jump(basicBlock: next)
     }
-    
+
     public func endWithBranch(trueBlock: BasicBlock, falseBlock: BasicBlock) {
-        guard case .none = self.next else {
+        guard case .none = next else {
             fatalError()
         }
-        self.next = BlockEnd.branch(trueBlock: trueBlock, falseBlock: falseBlock)
+        next = BlockEnd.branch(trueBlock: trueBlock, falseBlock: falseBlock)
     }
 
     public var description: String {
-        return ((opCodes.map { $0.description }) + [next.description]).joined(separator: "; ")
+        (opCodes.map(\.description) + [next.description]).joined(separator: "; ")
     }
-    
+
     public func hash(into hasher: inout Hasher) {
         hasher.combine(ObjectIdentifier(self).hashValue)
     }
@@ -219,7 +214,7 @@ public class BasicBlock: CustomStringConvertible, Hashable {
  *
  * It's always a bug in compiler if this is thrown: never an error in user program.
  */
-public struct InvalidStackUseException : Error {
+public struct InvalidStackUseException: Error {
     let message: String
     init(_ message: String) {
         self.message = message
@@ -230,27 +225,25 @@ public struct InvalidStackUseException : Error {
  * Graph of basic blocks for a single function, method etc.
  */
 public struct BasicBlockGraph {
-    
-    public init() {
-    }
-    
+    public init() {}
+
     public let start = BasicBlock()
-    
+
     var end: BasicBlock {
-        return allBlocksInArbitraryOrder().first {
+        allBlocksInArbitraryOrder().first {
             if case BasicBlock.BlockEnd.none = $0.next {
                 return true
             }
             return false
-            }!
+        }!
     }
-    
+
     func optimize() {
         for block in allBlocksInArbitraryOrder() {
             block.peepholeOptimize()
         }
     }
-    
+
     /**
      * Verifies that stack usage of the graph is valid.
      *
@@ -259,41 +252,40 @@ public struct BasicBlockGraph {
      * blocks are static, we can just verify that each basic block has a consistent
      * start depth no matter what path we reach it through.
      */
-    public func buildStackDepthMap() throws -> Dictionary<BasicBlock, Int> {
+    public func buildStackDepthMap() throws -> [BasicBlock: Int] {
         var startStackDepths = [start: 0]
-        
+
         for block in allBlocks() {
             guard let startDepth = startStackDepths[block] else {
                 fatalError("no depth assigned for \(block)")
             }
             let endDepth = startDepth + block.stackDelta
-            
+
             for next in block.next.blocks {
                 let nextDepth = startStackDepths[next]
-                if (nextDepth == nil) {
+                if nextDepth == nil {
                     startStackDepths[next] = endDepth
-                }
-                else if (nextDepth != endDepth) {
+                } else if nextDepth != endDepth {
                     throw InvalidStackUseException("expected \(String(describing: nextDepth)), but got \(endDepth) for \(block) -> \(next)")
                 }
             }
         }
-        
+
         let endDepth = startStackDepths[end]! + end.stackDelta
-        if (endDepth != 0) {
+        if endDepth != 0 {
             throw InvalidStackUseException("invalid end depth for stack: \(endDepth)")
         }
-        
+
         return startStackDepths
     }
-    
+
     func localVariablesCount() -> Int {
-        return allBlocksInArbitraryOrder().map { $0.maxLocalVariableOffset + 1 }.max() ?? 0
+        allBlocksInArbitraryOrder().map { $0.maxLocalVariableOffset + 1 }.max() ?? 0
     }
-    
+
     func allBlocks() -> OrderedSet<BasicBlock> {
         var blocks = allBlocksInArbitraryOrder()
-        
+
         // move the ending block to be last
         guard let endBlock = Array(blocks.filter {
             if case BasicBlock.BlockEnd.none = $0.next {
@@ -303,16 +295,15 @@ public struct BasicBlockGraph {
         }).singleOrNull() else {
             fatalError("no unique end block")
         }
-        
+
         blocks.remove(endBlock)
         blocks.append(endBlock)
         return blocks
     }
-    
-    
+
     private func allBlocksInArbitraryOrder() -> OrderedSet<BasicBlock> {
         var blocks = OrderedSet<BasicBlock>()
-        
+
         func gatherBlocks(block: BasicBlock) {
             if blocks.append(block) {
                 for b in block.next.blocks {
@@ -320,59 +311,58 @@ public struct BasicBlockGraph {
                 }
             }
         }
-        
+
         gatherBlocks(block: start)
         return blocks
     }
 }
 
-
 extension BasicBlockGraph {
     func translateToCode(argumentCount: Int) throws -> CodeSegment {
-        return try OpCodeTranslator(code: self, argumentCount: argumentCount).translate()
+        try OpCodeTranslator(code: self, argumentCount: argumentCount).translate()
     }
 }
 
 public class OpCodeTranslator {
     let code: BasicBlockGraph
     let argumentCount: Int
-    
+
     let localCount: Int
-    
+
     init(code: BasicBlockGraph, argumentCount: Int) {
         self.code = code
         self.argumentCount = argumentCount
-        self.localCount = code.localVariablesCount()
+        localCount = code.localVariablesCount()
     }
-    
+
     func translate() throws -> CodeSegment {
         let blocks = code.allBlocks()
-        
+
         let blockAddresses = calculateAddressesForBlocks(blocks: blocks)
         let stackDepths = try code.buildStackDepthMap()
-        
-        var ops = Array<OpCode>()
+
+        var ops = [OpCode]()
         for block in blocks {
             ops += try translateBlock(block: block, blockAddresses: blockAddresses, stackDepths: stackDepths)
         }
-        
+
         return CodeSegment(opCodes: ops)
     }
-    
-    private func translateBlock(block: BasicBlock, blockAddresses: Dictionary<BasicBlock, Int>, stackDepths: Dictionary<BasicBlock, Int>) throws -> Array<OpCode> {
-        var ops1 = Array<OpCode>()
+
+    private func translateBlock(block: BasicBlock, blockAddresses: [BasicBlock: Int], stackDepths: [BasicBlock: Int]) throws -> [OpCode] {
+        var ops1 = [OpCode]()
         let baseStackOffset = argumentCount + localCount // there's a +1 term from return address, but a cancelling -1 term from addressing convention
         var sp = baseStackOffset + stackDepths[block]!
-        
+
         for op in block.opCodes {
-            if (sp < baseStackOffset) {
+            if sp < baseStackOffset {
                 throw InvalidStackUseException("stack underflow")
             }
-            
+
             ops1 += [translate(ir: op, sp: sp)]
             sp += op.stackDelta
         }
-        
+
         let next = block.next
         switch next {
         case .none:
@@ -383,22 +373,22 @@ public class OpCodeTranslator {
             ops1 += [OpCode.jumpIfFalse(sp: sp, address: blockAddresses[falseBlock]!)]
             ops1 += [OpCode.jump(address: blockAddresses[trueBlock]!)]
         }
-        
+
         return ops1
     }
-    
-    private func calculateAddressesForBlocks(blocks: OrderedSet<BasicBlock>) -> Dictionary<BasicBlock, Int> {
-        var blockAddresses = Dictionary<BasicBlock, Int>()
-        
+
+    private func calculateAddressesForBlocks(blocks: OrderedSet<BasicBlock>) -> [BasicBlock: Int] {
+        var blockAddresses = [BasicBlock: Int]()
+
         var nextFreeAddress = 0
         for block in blocks {
             blockAddresses[block] = nextFreeAddress
             nextFreeAddress += translatedSize(block: block)
         }
-        
+
         return blockAddresses
     }
-    
+
     private func translatedSize(block: BasicBlock) -> Int {
         let c: Int
         switch block.next {
@@ -411,7 +401,7 @@ public class OpCodeTranslator {
         }
         return block.opCodes.count + c
     }
-    
+
     func translate(ir: IR, sp: Int) -> OpCode {
         switch ir {
         case IR.not: return OpCode.not(target: sp, source: sp)
@@ -442,17 +432,17 @@ public class OpCodeTranslator {
         case let IR.storeGlobal(index, name): return OpCode.storeGlobal(targetGlobal: index, source: sp, name: name)
         }
     }
-    
+
     private func argumentOffset(index: Int) -> Int {
-        return index
+        index
     }
-    
+
     private func returnAddressOffset() -> Int {
-        return argumentCount
+        argumentCount
     }
-    
+
     private func localOffset(index: Int) -> Int {
-        return argumentCount + 1 + index
+        argumentCount + 1 + index
     }
 }
 
@@ -461,31 +451,30 @@ public class OpCodeTranslator {
  */
 class FunctionTranslator {
     let env: GlobalStaticEnvironment
-    
+
     init(env: GlobalStaticEnvironment) {
         self.env = env
     }
-    
+
     func translateFunction(func: FunctionDefinition, optimize: Bool) throws -> (Type.Function, CodeSegment) {
         var typedExp = try `func`.body.typeCheck(env: env.newScope(args: `func`.args))
-        if (optimize) {
+        if optimize {
             typedExp = typedExp.optimize()
         }
-        
+
         if let returnType = `func`.returnType {
             try typedExp.expectAssignableTo(expectedType: returnType, location: `func`.body.location)
         }
-        
+
         let basicBlocks = typedExp.translateToIR()
-        
-        if (optimize) {
+
+        if optimize {
             basicBlocks.optimize()
         }
-        
-        return (Type.Function.function(argumentTypes: `func`.args.map { $0.1 }, returnType: typedExp.type), try basicBlocks.translateToCode(argumentCount: `func`.args.count))
+
+        return (Type.Function.function(argumentTypes: `func`.args.map(\.1), returnType: typedExp.type), try basicBlocks.translateToCode(argumentCount: `func`.args.count))
     }
 }
-
 
 extension TypedExpression {
     func translateToIR() -> BasicBlockGraph {
@@ -497,14 +486,13 @@ extension TypedExpression {
 }
 
 public class Translator {
-    
     let basicBlocks = BasicBlockGraph()
     private var currentBlock: BasicBlock
-    
+
     init() {
         currentBlock = basicBlocks.start
     }
-    
+
     func emitCode(typedExpression: TypedExpression) {
         switch typedExpression {
         case let .ref(bindingReference):
@@ -537,62 +525,59 @@ public class Translator {
             currentBlock += IR.pushUnit
         case let .if(condition, consequent, alternative, _):
             emitCode(typedExpression: condition)
-            
+
             let afterBlock = BasicBlock()
-            
-            
+
             if let alternative = alternative {
                 let trueBlock = BasicBlock()
                 let falseBlock = BasicBlock()
-                
+
                 currentBlock.endWithBranch(trueBlock: trueBlock, falseBlock: falseBlock)
-                
+
                 currentBlock = trueBlock
                 emitCode(typedExpression: consequent)
                 currentBlock.endWithJumpTo(next: afterBlock)
-                
+
                 currentBlock = falseBlock
                 emitCode(typedExpression: alternative)
-                
+
                 currentBlock.endWithJumpTo(next: afterBlock)
-                
-            }
-            else {
+            } else {
                 let trueBlock = BasicBlock()
-                
+
                 currentBlock.endWithBranch(trueBlock: trueBlock, falseBlock: afterBlock)
-                
+
                 currentBlock = trueBlock
                 emitCode(typedExpression: consequent)
                 currentBlock += IR.pop
                 currentBlock.endWithJumpTo(next: afterBlock)
-                
+
                 afterBlock += IR.pushUnit
             }
-            
+
             currentBlock = afterBlock
         case let .while(condition, body):
-            
+
             let loopHead = BasicBlock()
             let loopBody = BasicBlock()
             let afterLoop = BasicBlock()
-            
+
             currentBlock.endWithJumpTo(next: loopHead)
-            
+
             currentBlock = loopHead
             emitCode(typedExpression: condition)
             currentBlock.endWithBranch(trueBlock: loopBody, falseBlock: afterLoop)
-            
+
             currentBlock = loopBody
             emitCode(typedExpression: body)
             currentBlock += IR.pop
             currentBlock.endWithJumpTo(next: loopHead)
-            
+
             currentBlock = afterLoop
             currentBlock += IR.pushUnit
         }
     }
-    
+
     func emitCode(binary: TypedExpression.Binary) {
         emitCode(typedExpression: binary.lhs)
         emitCode(typedExpression: binary.rhs)
@@ -609,10 +594,9 @@ public class Translator {
             currentBlock += IR.concatString
         case let .relational(op, _, _):
             emitCode(relationalOp: op)
-            
         }
     }
-    
+
     func emitCode(relationalOp: RelationalOp) {
         switch relationalOp {
         case .equals:
@@ -632,7 +616,7 @@ public class Translator {
             currentBlock += IR.not
         }
     }
-    
+
     func emitStore(binding: Binding) {
         switch binding {
         case let .local(name, _, index, _):
@@ -643,7 +627,7 @@ public class Translator {
             fatalError("can't store into arguments")
         }
     }
-    
+
     func emitLoad(binding: Binding) {
         switch binding {
         case let .local(name, _, index, _):
