@@ -18,7 +18,7 @@ public struct SourceLocation: Equatable, CustomStringConvertible {
     /**
      * Returns single line representation of the location.
      */
-    public var description: String { return "[\(file.description):\(line.description):\(column.description)]" }
+    public var description: String { "[\(file.description):\(line.description):\(column.description)]" }
 
     /**
      * Returns two line representation of the location.
@@ -44,7 +44,7 @@ open class SyntaxErrorException: Error, CustomStringConvertible {
     }
 
     public var description: String {
-        return "\(errorMessage)\n\(sourceLocation.toLongString())"
+        "\(errorMessage)\n\(sourceLocation.toLongString())"
     }
 }
 
@@ -58,7 +58,6 @@ public class UnexpectedEndOfInputException: SyntaxErrorException {
         super.init(errorMessage: "unexpected end of input", sourceLocation: sourceLocation)
     }
 }
-
 
 /**
  * Tokens are the indivisible building blocks of source code.
@@ -98,19 +97,19 @@ public enum Token: Equatable, CustomStringConvertible {
      */
     case punctuation(Punctuation)
 
-    public enum Keyword : String, CustomStringConvertible {
+    public enum Keyword: String, CustomStringConvertible {
         case `else` = "else"
         case fun = "fun"
         case `if` = "if"
-        case `unless` = "unless"
+        case unless = "unless"
         case `var` = "var"
         case val = "val"
         case `while` = "while"
 
-        public var description: String { return self.rawValue.description }
+        public var description: String { rawValue.description }
     }
 
-    public enum Operator : String, CaseIterable, CustomStringConvertible {
+    public enum Operator: String, CaseIterable, CustomStringConvertible {
         case plus = "+"
         case minus = "-"
         case multiply = "*"
@@ -125,10 +124,10 @@ public enum Token: Equatable, CustomStringConvertible {
         case and = "&&"
         case or = "||"
 
-        public var description: String { return self.rawValue.description }
+        public var description: String { rawValue.description }
     }
 
-    public enum Punctuation : String, CaseIterable, CustomStringConvertible {
+    public enum Punctuation: String, CaseIterable, CustomStringConvertible {
         case leftParen = "("
         case rightParen = ")"
         case leftBrace = "{"
@@ -138,8 +137,9 @@ public enum Token: Equatable, CustomStringConvertible {
         case semicolon = ";"
         case comma = ","
 
-        public var description: String { return "'\(self.rawValue.description)'" }
+        public var description: String { "'\(rawValue.description)'" }
     }
+
     public var description: String {
         switch self {
         case let .identifier(name):
@@ -154,7 +154,6 @@ public enum Token: Equatable, CustomStringConvertible {
             return value.description
         }
     }
-
 }
 
 /**
@@ -163,7 +162,7 @@ public enum Token: Equatable, CustomStringConvertible {
 public struct TokenInfo: CustomStringConvertible {
     public let token: Token
     public let location: SourceLocation
-    public var description: String { return "[TokenInfo \(token) \(location)]" }
+    public var description: String { "[TokenInfo \(token) \(location)]" }
 }
 
 /**
@@ -192,24 +191,24 @@ public class Lexer {
     /** Current column number. Used for [SourceLocation]. */
     private var column = 1
 
-    private let source: Array<Character>
+    private let source: [Character]
     private let file: String
 
     /** Lines of the file. Used for [SourceLocation]. */
-    private let lines: Array<Substring>
+    private let lines: [Substring]
 
     public init(source: String, file: String = "<unknown>") throws {
         self.source = source.unicodeScalars.map { Character(UnicodeScalar($0)) }
         lines = source.lines()
         self.file = file
-        try self.skipWhitespace()
+        try skipWhitespace()
     }
 
     /**
      * Does the source contain more tokens?
      */
     public var hasMore: Bool {
-        return position < source.count
+        position < source.count
     }
 
     /**
@@ -221,73 +220,60 @@ public class Lexer {
         let ch = try peekChar()
 
         let token: Token = try {
-
-            if (ch.isLetter) { return try readSymbol() }
-            else if (ch.isWholeNumber) { return try readNumber() }
-            else if (ch == "\"") { return try readString() }
-            else if (try readIf(ch: "+")) { return .operator(.plus) }
-            else if (try readIf(ch: "-")) { return .operator(.minus) }
-            else if (try readIf(ch: "*")) { return .operator(.multiply) }
-            else if (try readIf(ch: "/")) { return .operator(.divide) }
-            else if (try readIf(ch: "(")) { return .punctuation(.leftParen) }
-            else if (try readIf(ch: ")")) { return .punctuation(.rightParen) }
-            else if (try readIf(ch: "{")) { return .punctuation(.leftBrace) }
-            else if (try readIf(ch: "}")) { return .punctuation(.rightBrace) }
-            else if (try readIf(ch: ":")) { return .punctuation(.colon) }
-            else if (try readIf(ch: ";")) { return .punctuation(.semicolon) }
-            else if (try readIf(ch: ",")) { return .punctuation(.comma) }
-            else if (try readIf(ch: "=")) {
-                if (try readIf(ch: "=")) {
+            if ch.isLetter { return try readSymbol() }
+            else if ch.isWholeNumber { return try readNumber() }
+            else if ch == "\"" { return try readString() }
+            else if try readIf(ch: "+") { return .operator(.plus) }
+            else if try readIf(ch: "-") { return .operator(.minus) }
+            else if try readIf(ch: "*") { return .operator(.multiply) }
+            else if try readIf(ch: "/") { return .operator(.divide) }
+            else if try readIf(ch: "(") { return .punctuation(.leftParen) }
+            else if try readIf(ch: ")") { return .punctuation(.rightParen) }
+            else if try readIf(ch: "{") { return .punctuation(.leftBrace) }
+            else if try readIf(ch: "}") { return .punctuation(.rightBrace) }
+            else if try readIf(ch: ":") { return .punctuation(.colon) }
+            else if try readIf(ch: ";") { return .punctuation(.semicolon) }
+            else if try readIf(ch: ",") { return .punctuation(.comma) }
+            else if try readIf(ch: "=") {
+                if try readIf(ch: "=") {
                     return .operator(.equalEqual)
-                }
-                else {
+                } else {
                     return .punctuation(.equal)
                 }
-            }
-            else if (try readIf(ch: "!")) {
-                if (try readIf(ch: "=")) {
+            } else if try readIf(ch: "!") {
+                if try readIf(ch: "=") {
                     return .operator(.notEqual)
-                }
-                else {
+                } else {
                     return .operator(.not)
                 }
-            }
-            else if (try readIf(ch: "<")) {
-                if (try readIf(ch: "=")) {
+            } else if try readIf(ch: "<") {
+                if try readIf(ch: "=") {
                     return .operator(.lessThanOrEqual)
-                }
-                else {
+                } else {
                     return .operator(.lessThan)
                 }
-            }
-            else if (try readIf(ch: ">")) {
-                if (try readIf(ch: "=")) {
+            } else if try readIf(ch: ">") {
+                if try readIf(ch: "=") {
                     return .operator(.greaterThanOrEqual)
-                }
-                else {
+                } else {
                     return .operator(.greaterThan)
                 }
-            }
-            else if (try readIf(ch: "&")) {
-                if (try readIf(ch: "&")) {
+            } else if try readIf(ch: "&") {
+                if try readIf(ch: "&") {
                     return .operator(.and)
-                }
-                else {
+                } else {
                     throw fail(message: "got '&', did you mean '&&'?")
                 }
-            }
-            else if (try readIf(ch: "|")) {
-                if (try readIf(ch: "|")) {
+            } else if try readIf(ch: "|") {
+                if try readIf(ch: "|") {
                     return .operator(.or)
-                }
-                else {
+                } else {
                     throw fail(message: "got '|', did you mean '||'?")
                 }
-            }
-            else {
+            } else {
                 throw fail(message: "unexpected character '\(ch)'")
             }
-            }()
+        }()
 
         try skipWhitespace()
 
@@ -304,7 +290,7 @@ public class Lexer {
         let str = try readWhile { $0.isLetter || $0.isWholeNumber || $0 == "_" }
         switch str {
         case "else":
-            return .keyword(.`else`)
+            return .keyword(.else)
         case "fun":
             return .keyword(.fun)
         case "if":
@@ -349,19 +335,16 @@ public class Lexer {
 
         try expect(ch: "\"")
 
-        while (hasMore) {
+        while hasMore {
             let ch = try readChar()
-            if (escape) {
+            if escape {
                 sb.append(ch)
                 escape = false
-            }
-            else if (ch == "\\") {
+            } else if ch == "\\" {
                 escape = true
-            }
-            else if (ch == "\"") {
+            } else if ch == "\"" {
                 return .literal(value: .string(value: String(sb)))
-            }
-            else {
+            } else {
                 sb.append(ch)
             }
         }
@@ -373,7 +356,7 @@ public class Lexer {
      * Returns the next character in source code without consuming it.
      */
     private func peekChar() throws -> Character {
-        if (!hasMore) {
+        if !hasMore {
             throw unexpectedEnd()
         }
         return source[position]
@@ -387,8 +370,7 @@ public class Lexer {
         if try (hasMore && peekChar() == ch) {
             try readChar()
             return true
-        }
-        else {
+        } else {
             return false
         }
     }
@@ -397,7 +379,7 @@ public class Lexer {
      * Skip characters in input as long as [predicate] returns `true`.
      */
     private func skipWhile(predicate: (Character) -> Bool) throws {
-        while (hasMore && predicate(source[position])) {
+        while hasMore, predicate(source[position]) {
             try readChar()
         }
     }
@@ -419,17 +401,16 @@ public class Lexer {
      * this method takes care of adjusting [line] and [column] accordingly.
      */
     @discardableResult private func readChar() throws -> Character {
-        if (!hasMore) {
+        if !hasMore {
             throw unexpectedEnd()
         }
         let ch = source[position]
         position += 1
 
-        if (ch == "\n") {
+        if ch == "\n" {
             line += 1
             column = 1
-        }
-        else {
+        } else {
             column += 1
         }
 
@@ -441,10 +422,9 @@ public class Lexer {
      */
     private func expect(ch: Character) throws {
         let c = try peekChar()
-        if (ch == c) {
+        if ch == c {
             try readChar()
-        }
-        else {
+        } else {
             throw fail(message: "expected '\(ch)', but got '\(c)'")
         }
     }
@@ -452,29 +432,29 @@ public class Lexer {
     /**
      * Skips all whitespace.
      */
-    private func skipWhitespace() throws -> Void {
+    private func skipWhitespace() throws {
         try skipWhile { $0.isWhitespace }
     }
 
     /**
      * Returns current source location.
      */
-    public var currentSourceLocation : SourceLocation {
-        return SourceLocation(file: file, line: line, column: column, lineText: String(lines[line - 1]))
+    public var currentSourceLocation: SourceLocation {
+        SourceLocation(file: file, line: line, column: column, lineText: String(lines[line - 1]))
     }
 
     /**
      * Throws [SyntaxErrorException] with given [message] and current [SourceLocation].
      */
     private func fail(message: String) -> SyntaxErrorException {
-        return SyntaxErrorException(errorMessage: message, sourceLocation: currentSourceLocation)
+        SyntaxErrorException(errorMessage: message, sourceLocation: currentSourceLocation)
     }
 
     /**
      * Throws [UnexpectedEndOfInputException] with current [SourceLocation].
      */
     func unexpectedEnd() -> UnexpectedEndOfInputException {
-        return UnexpectedEndOfInputException(sourceLocation: currentSourceLocation)
+        UnexpectedEndOfInputException(sourceLocation: currentSourceLocation)
     }
 }
 
@@ -510,13 +490,13 @@ public class LookaheadLexer {
      *
      * If we are in sync with [lexer], then the lookahead is `null`,
      */
-    var lookahead: TokenInfo? = nil
+    var lookahead: TokenInfo?
 
     /**
      * Are there any more tokens in the input?
      */
     public var hasMore: Bool {
-        return lookahead != nil || lexer.hasMore
+        lookahead != nil || lexer.hasMore
     }
 
     /**
@@ -537,8 +517,7 @@ public class LookaheadLexer {
         let lookahead: TokenInfo
         if let l = self.lookahead {
             lookahead = l
-        }
-        else {
+        } else {
             lookahead = try lexer.readToken()
         }
         self.lookahead = lookahead
@@ -549,14 +528,14 @@ public class LookaheadLexer {
      * Returns the location of the next token.
      */
     func nextTokenLocation() throws -> SourceLocation {
-        return try peekToken().location
+        try peekToken().location
     }
 
     /**
      * Returns true if the next token is [token].
      */
     func nextTokenIs(token: Token) throws -> Bool {
-        return try (hasMore && peekToken().token == token)
+        try (hasMore && peekToken().token == token)
     }
 
     /**
@@ -564,11 +543,10 @@ public class LookaheadLexer {
      * consume the token and return `false`.
      */
     public func readNextIf(token: Token) throws -> Bool {
-        if (try nextTokenIs(token: token)) {
+        if try nextTokenIs(token: token) {
             try readToken()
             return true
-        }
-        else {
+        } else {
             return false
         }
     }
@@ -579,15 +557,14 @@ public class LookaheadLexer {
      */
     @discardableResult public func expect(expected: Token) throws -> SourceLocation {
         let tokenInfo = try readToken()
-        if (tokenInfo.token == expected) {
+        if tokenInfo.token == expected {
             return tokenInfo.location
-        }
-        else {
+        } else {
             throw SyntaxErrorException(errorMessage: "expected token \(expected.description), but got \(tokenInfo.token.description)", sourceLocation: tokenInfo.location)
         }
     }
 
-    public var currentSourceLocation : SourceLocation {
-        return self.lexer.currentSourceLocation
+    public var currentSourceLocation: SourceLocation {
+        lexer.currentSourceLocation
     }
 }

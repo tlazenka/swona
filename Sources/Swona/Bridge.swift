@@ -1,12 +1,12 @@
 @dynamicMemberLookup
 public struct Bridge {
     public init() throws {
-        self.evaluator = Evaluator(trace: false)
+        evaluator = Evaluator(trace: false)
         try registerRuntimeFunctions(evaluator: evaluator)
     }
-    
+
     public let evaluator: Evaluator
-    
+
     public subscript(dynamicMember member: String) -> Value? {
         get {
             guard let bindingReference = evaluator.globalTypeEnvironment.bindings[member] else {
@@ -14,7 +14,7 @@ public struct Bridge {
             }
             return evaluator.globalData[bindingReference.binding.index]
         }
-        
+
         nonmutating set {
             evaluator.globalTypeEnvironment.unbind(name: member)
             if let newValue = newValue {
@@ -22,16 +22,13 @@ public struct Bridge {
             }
         }
     }
-    
+
     public subscript(dynamicMember member: String) -> Expression {
-        return member.ref
+        member.ref
     }
 
-    
     public subscript(dynamicMember member: String) -> BridgeRuntimeFunction {
-        get {
-            return BridgeRuntimeFunction(evaluator: evaluator, name: member)
-        }
+        BridgeRuntimeFunction(evaluator: evaluator, name: member)
     }
 }
 
@@ -39,44 +36,42 @@ public struct Bridge {
 public struct BridgeRuntimeFunction {
     let evaluator: Evaluator
     let name: String
-    
+
     public init(evaluator: Evaluator, name: String) {
         self.evaluator = evaluator
         self.name = name
     }
-    
+
     @discardableResult
     public func dynamicallyCall(withArguments arguments: [Expression]) throws -> Value {
         let expression = Expression.call(func: .ref(name: name, location: bridgeSourceLocation()), args: arguments)
-        
+
         let typeChecked = try expression.typeCheck(env: evaluator.globalTypeEnvironment)
         let translated = try evaluator.translate(exp: typeChecked)
         let evaluated = try evaluator.evaluateSegment(segment: translated)
-        
-        
+
         return EvaluationResult(value: evaluated, type: typeChecked.type).value
     }
-    
 }
 
 extension String {
     public var lit: Expression {
-        return Expression.lit(value: self.value, location: bridgeSourceLocation())
+        Expression.lit(value: value, location: bridgeSourceLocation())
     }
-    
+
     public var ref: Expression {
-        return Expression.ref(name: self, location: bridgeSourceLocation())
+        Expression.ref(name: self, location: bridgeSourceLocation())
     }
 }
 
 extension Int {
     public var lit: Expression {
-        return Expression.lit(value: self.value, location: bridgeSourceLocation())
+        Expression.lit(value: value, location: bridgeSourceLocation())
     }
 }
 
 func bridgeSourceLocation(file: String = #file) -> SourceLocation {
-    return SourceLocation(file: file, line: 0, column: 0, lineText: "")
+    SourceLocation(file: file, line: 0, column: 0, lineText: "")
 }
 
 extension Value.Function {
@@ -113,13 +108,12 @@ extension Value: ExpressibleByBooleanLiteral {
 
 extension Value: ExpressibleByArrayLiteral {
     public init(arrayLiteral elements: Value...) {
-        let types = Set(elements.map { $0.type })
-        
+        let types = Set(elements.map(\.type))
+
         guard let type = types.first, types.count == 1 else {
             fatalError("Only arrays of a single type are supported")
         }
-        
+
         self = .array(elements: .init(array: elements), elementType: type)
     }
 }
-

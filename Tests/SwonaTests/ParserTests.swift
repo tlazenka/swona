@@ -1,5 +1,5 @@
-import XCTest
 import Swona
+import XCTest
 
 final class ParserTests: XCTestCase {
     func testVariables() throws {
@@ -12,23 +12,19 @@ final class ParserTests: XCTestCase {
         try assertParseExpression(source: "true", expected: "[Lit true]")
     }
 
-
     func testIfStatements() throws {
         try assertParseExpression(source: "if (x) y else z", expected: "[If [Ref x] [Ref y] [Ref z]]")
         try assertParseExpression(source: "if (x) y", expected: "[If [Ref x] [Ref y] []]")
     }
-
 
     func testUnlessStatements() throws {
         try assertParseExpression(source: "unless (x) y else z", expected: "[If [Not [Ref x]] [Ref y] [Ref z]]")
         try assertParseExpression(source: "unless (x) y", expected: "[If [Not [Ref x]] [Ref y] []]")
     }
 
-
     func testWhileStatements() throws {
         try assertParseExpression(source: "while (x) y", expected: "[While [Ref x] [Ref y]]")
     }
-
 
     func testAssignment() throws {
         try assertParseExpression(source: "foo = bar", expected: "[Assign foo [Ref bar]]")
@@ -63,7 +59,6 @@ final class ParserTests: XCTestCase {
         assertSyntaxError(code: "1 = bar;")
     }
 
-
     func testBinaryOperators() throws {
         try assertParseExpression(source: "1 + 2", expected: "[Plus [Lit 1] [Lit 2]]")
         try assertParseExpression(source: "1 - 2", expected: "[Minus [Lit 1] [Lit 2]]")
@@ -80,7 +75,6 @@ final class ParserTests: XCTestCase {
     func testNot() throws {
         try assertParseExpression(source: "!x", expected: "[Not [Ref x]]")
     }
-
 
     func testOperatorPrecedence() throws {
         try assertParseExpression(source: "a + b == c + d", expected: "[== [Plus [Ref a] [Ref b]] [Plus [Ref c] [Ref d]]]")
@@ -101,7 +95,7 @@ final class ParserTests: XCTestCase {
 
     func testFunctionDefinition() throws {
         try assertParseFunctionDefinition(source: "fun square(x: Int, y: Int): Int = x * x",
-                                      expected: "FunctionDefinition(name=square, args=[(x, Int), (y, Int)], returnType=Int, body=[Multiply [Ref x] [Ref x]])")
+                                          expected: "FunctionDefinition(name=square, args=[(x, Int), (y, Int)], returnType=Int, body=[Multiply [Ref x] [Ref x]])")
     }
 
     func testSamples() throws {
@@ -109,7 +103,7 @@ final class ParserTests: XCTestCase {
             """
             if (x == 2 + 2) { var t = "It"; s = t + " worked!" }
             """,
-                                  expected:
+            expected:
             """
             [If [== [Ref x] [Plus [Lit 2] [Lit 2]]] [ExpressionList [[Var t [Lit "It"]], [Assign s [Plus [Ref t] [Lit " worked!"]]]]] []]
             """)
@@ -121,7 +115,7 @@ final class ParserTests: XCTestCase {
             else
                 fib(i-1) + fib(i-2)
             """,
-                                          expected:
+            expected:
             """
             FunctionDefinition(name=fib, args=[(i, Int)], returnType=Int, body=[If [Or [== [Ref i] [Lit 0]] [== [Ref i] [Lit 1]]] [Ref i] [Plus [Call [Ref fib] [[Minus [Ref i] [Lit 1]]]] [Call [Ref fib] [[Minus [Ref i] [Lit 2]]]]]])
             """)
@@ -130,7 +124,7 @@ final class ParserTests: XCTestCase {
             """
             fun square(x: Int) = x * x
             """,
-                                          expected:
+            expected:
             """
             FunctionDefinition(name=square, args=[(x, Int)], returnType=null, body=[Multiply [Ref x] [Ref x]])
             """)
@@ -139,7 +133,7 @@ final class ParserTests: XCTestCase {
             """
             fun cube(x: Int) = x * x * x
             """,
-                                          expected:
+            expected:
             """
             FunctionDefinition(name=cube, args=[(x, Int)], returnType=null, body=[Multiply [Multiply [Ref x] [Ref x]] [Ref x]])
             """)

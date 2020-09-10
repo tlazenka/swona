@@ -6,18 +6,21 @@ import PackageDescription
 let package = Package(
     name: "Swona",
     products: [
-    	.library(
-    		name: "Swona",
-    		targets: ["Swona"]),
+        .library(
+            name: "Swona",
+            targets: ["Swona"]
+        ),
     ],
     dependencies: [
     ],
     targets: [
         .target(
             name: "Swona",
-            dependencies: []),
-         .testTarget(
+            dependencies: []
+        ),
+        .testTarget(
             name: "SwonaTests",
-            dependencies: ["Swona"]),
+            dependencies: ["Swona"]
+        ),
     ]
 )
