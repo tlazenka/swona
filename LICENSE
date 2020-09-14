@@ -297,19 +297,26 @@ SOFTWARE.
 
 * Kotlin - https://github.com/JetBrains/kotlin/tree/master/license
 
-Copyright 2010-2020 JetBrains s.r.o. and Kotlin Programming Language contributors.
+https://github.com/JetBrains/kotlin/blob/master/license/COPYRIGHT.txt
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+/*
+* Copyright 2010-2020 JetBrains s.r.o. and Kotlin Programming Language contributors.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 
-http://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+https://github.com/JetBrains/kotlin/blob/master/license/NOTICE.txt
 
 =========================================================================
 ==  NOTICE file corresponding to the section 4 d of                    ==
@@ -320,6 +327,8 @@ limitations under the License.
 Kotlin Compiler
 Copyright 2010-2020 JetBrains s.r.o and respective authors and developers
 
+
+https://github.com/JetBrains/kotlin/blob/master/license/LICENSE.txt
 
                                  Apache License
                            Version 2.0, January 2004
@@ -575,6 +584,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
-
-
-
