@@ -33,4 +33,4 @@ jobs:
        run: mint install nicklockwood/SwiftFormat@0.46.2
      - uses: actions/checkout@v2
      - name: Run SwiftFormat lint
-       run: swiftformat --lint
+       run: swiftformat --lint .
