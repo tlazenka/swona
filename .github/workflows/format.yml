@@ -1,0 +1,21 @@
+name: Swift
+
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  build:
+
+    runs-on: macos-latest
+
+    steps:
+    - name: Install Mint
+      run: brew install mint
+    - name: Install SwiftFormat
+      run: mint install nicklockwood/SwiftFormat@0.46.2
+    - uses: actions/checkout@v2
+    - name: Run SwiftFormat lint
+      run: swiftformat --lint
