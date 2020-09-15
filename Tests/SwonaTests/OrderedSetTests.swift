@@ -1,7 +1,19 @@
+/*
+  This source file is part of the Swift.org open source project
+
+ Copyright 2016 Apple Inc. and the Swift project authors
+ Licensed under Apache License v2.0 with Runtime Library Exception
+
+ See http://swift.org/LICENSE.txt for license information
+ See http://swift.org/CONTRIBUTORS.txt for Swift project authors
+
+  The below code was modified from the original.
+ */
+
 import XCTest
 @testable import Swona
 
-final class HelpersTests: XCTestCase {
+final class OrderedSetTests: XCTestCase {
     func testOrderedSetWithSingleElement() {
         var orderedSet = OrderedSet<String>()
         XCTAssertEqual(orderedSet.count, 0)
@@ -143,7 +155,7 @@ final class HelpersTests: XCTestCase {
         XCTAssertNotEqual(OrderedSet(["3", "2", "1"]), OrderedSet(["2", "1"]))
     }
 
-    // https://github.com/apple/swift-package-manager/blob/927a57c33cf105748977f4d066a08f84372a87ac/Tests/BasicTests/OrderedSetTests.swift
+    // See https://github.com/apple/swift-package-manager/blob/927a57c33cf105748977f4d066a08f84372a87ac/Tests/BasicTests/OrderedSetTests.swift
     // Modified from Swift Package Manager (Apache License, Version 2.0). See LICENSE in this repo
     func testOrderedSetBasics() {
         // Create an empty set.
@@ -175,105 +187,11 @@ final class HelpersTests: XCTestCase {
         XCTAssert(three)
     }
 
-    func testSingles() {
-        XCTAssertNil([].singleOrNull())
-        XCTAssertNil([1, 2].singleOrNull())
-        XCTAssertEqual([1].singleOrNull(), 1)
-        XCTAssertEqual([2].single(), 2)
-    }
-
-    func testSumBy() {
-        XCTAssertEqual([1].sumBy { $0 + 1 }, 2)
-        XCTAssertEqual([1, 2].sumBy { $0 + 1 }, 5)
-        XCTAssertEqual([1, 2, 3].sumBy { $0 * 2 }, 12)
-        XCTAssertEqual([].sumBy { $0 + 1 }, 0)
-    }
-
-    func testSubList() {
-        XCTAssertEqual([1].subList(fromIndex: 0, toIndex: 0), [])
-        XCTAssertEqual([1, 2].subList(fromIndex: 0, toIndex: 0), [])
-        XCTAssertEqual([1].subList(fromIndex: 0, toIndex: 1), [1])
-        XCTAssertEqual([1, 2].subList(fromIndex: 0, toIndex: 1), [1])
-        XCTAssertEqual([1, 2].subList(fromIndex: 1, toIndex: 1), [])
-        XCTAssertEqual([1, 2].subList(fromIndex: 0, toIndex: 2), [1, 2])
-        XCTAssertEqual([1, 2].subList(fromIndex: 1, toIndex: 2), [2])
-        XCTAssertEqual([1, 2, 3].subList(fromIndex: 1, toIndex: 2), [2])
-        XCTAssertEqual([1, 2, 3].subList(fromIndex: 0, toIndex: 2), [1, 2])
-        XCTAssertEqual([1, 2, 3].subList(fromIndex: 2, toIndex: 2), [])
-        XCTAssertEqual([1, 2, 3].subList(fromIndex: 2, toIndex: 3), [3])
-        XCTAssertEqual([1, 2, 3, 4].subList(fromIndex: 2, toIndex: 3), [3])
-        XCTAssertEqual([1, 2, 3, 4].subList(fromIndex: 2, toIndex: 4), [3, 4])
-    }
-
-    func testBoolInt() {
-        XCTAssertEqual(Int(true), 1)
-        XCTAssertEqual(Int(false), 0)
-    }
-
-    func testLines() {
-        XCTAssertEqual("".lines(), [""])
-        XCTAssertEqual("1".lines(), ["1"])
-        XCTAssertEqual("1\n2".lines(), ["1", "2"])
-        XCTAssertEqual("1\n2\n3".lines(), ["1", "2", "3"])
-        XCTAssertEqual("1\n\n2\n3".lines(), ["1", "", "2", "3"])
-        XCTAssertEqual("\n1\n\n2\n3\n\n".lines(), ["", "1", "", "2", "3", "", ""])
-    }
-
-    func testSubstring() {
-        XCTAssertEqual("a".substring(startOffset: 0, endOffset: 0), "")
-        XCTAssertEqual("a".substring(startOffset: 0, endOffset: 0), "")
-        XCTAssertEqual("a".substring(startOffset: 0, endOffset: 1), "a")
-
-        XCTAssertEqual("ab".substring(startOffset: 0, endOffset: 0), "")
-        XCTAssertEqual("ab".substring(startOffset: 0, endOffset: 0), "")
-        XCTAssertEqual("ab".substring(startOffset: 0, endOffset: 1), "a")
-        XCTAssertEqual("ab".substring(startOffset: 1, endOffset: 1), "")
-        XCTAssertEqual("ab".substring(startOffset: 1, endOffset: 2), "b")
-        XCTAssertEqual("ab".substring(startOffset: 0, endOffset: 2), "ab")
-
-        XCTAssertEqual("abc".substring(startOffset: 0, endOffset: 0), "")
-        XCTAssertEqual("abc".substring(startOffset: 1, endOffset: 1), "")
-        XCTAssertEqual("abc".substring(startOffset: 1, endOffset: 2), "b")
-        XCTAssertEqual("abc".substring(startOffset: 0, endOffset: 2), "ab")
-        XCTAssertEqual("abc".substring(startOffset: 1, endOffset: 2), "b")
-        XCTAssertEqual("abc".substring(startOffset: 1, endOffset: 3), "bc")
-        XCTAssertEqual("abc".substring(startOffset: 0, endOffset: 3), "abc")
-        XCTAssertEqual("abc".substring(startOffset: 2, endOffset: 3), "c")
-    }
-
-    func testPadEnd() {
-        XCTAssertEqual("".padEnd(count: 0, padChar: "."), "")
-        XCTAssertEqual("".padEnd(count: 1, padChar: "."), ".")
-        XCTAssertEqual("".padEnd(count: 4, padChar: "."), "....")
-        XCTAssertEqual("a".padEnd(count: 0, padChar: "."), "a")
-        XCTAssertEqual("a".padEnd(count: 1, padChar: "."), "a")
-        XCTAssertEqual("a".padEnd(count: 4, padChar: "."), "a...")
-        XCTAssertEqual("ab".padEnd(count: 4, padChar: "."), "ab..")
-    }
-
-    func testPadStart() {
-        XCTAssertEqual("".padStart(count: 0, padChar: "."), "")
-        XCTAssertEqual("".padStart(count: 1, padChar: "."), ".")
-        XCTAssertEqual("".padStart(count: 4, padChar: "."), "....")
-        XCTAssertEqual("a".padStart(count: 0, padChar: "."), "a")
-        XCTAssertEqual("a".padStart(count: 1, padChar: "."), "a")
-        XCTAssertEqual("a".padStart(count: 4, padChar: "."), "...a")
-        XCTAssertEqual("ab".padStart(count: 4, padChar: "."), "..ab")
-    }
-
     static var allTests = [
         ("testOrderedSetWithSingleElement", testOrderedSetWithSingleElement),
         ("testOrderedSetWithMultipleElements", testOrderedSetWithMultipleElements),
         ("testOrderedSetFromArray", testOrderedSetFromArray),
         ("testOrderedSetExtensions", testOrderedSetExtensions),
         ("testOrderedSetBasics", testOrderedSetBasics),
-        ("testSingles", testSingles),
-        ("testSumBy", testSumBy),
-        ("testSubList", testSubList),
-        ("testBoolInt", testBoolInt),
-        ("testSubstring", testSubstring),
-        ("testLines", testLines),
-        ("testPadEnd", testPadEnd),
-        ("testPadStart", testPadStart),
     ]
 }
