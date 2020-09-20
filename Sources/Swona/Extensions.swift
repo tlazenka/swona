@@ -1,3 +1,11 @@
+/*
+ * Copyright 2010-2018 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the
+ * https://github.com/JetBrains/kotlin/blob/master/license/LICENSE.txt file.
+ *
+ * The below code was modified from the original.
+ */
+
 extension String {
     // Modified from Kotlin (Apache License, Version 2.0). See LICENSE in this repo
     public func lines() -> [Substring] {
