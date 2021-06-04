@@ -1,0 +1,56 @@
+name: Swift
+
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
+env:
+  DEVELOPER_DIR: /Applications/Xcode_12.app/Contents/Developer
+
+jobs:
+  test:
+
+    runs-on: macos-latest
+    env:
+      working_directory: ./
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build
+      run: swift build -v
+      working-directory: ${{env.working_directory}}
+    - name: Run tests
+      run: swift test -v
+      working-directory: ${{env.working_directory}}
+
+  format:
+
+    runs-on: macos-latest
+
+    steps:
+     - name: Install Mint
+       run: brew install mint
+     - uses: actions/checkout@v2
+     - name: Run SwiftFormat lint
+       run: mint run nicklockwood/SwiftFormat@0.46.2 --lint .
+
+  repl:
+
+    runs-on: macos-latest
+    env:
+      working_directory: ./Repl
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build
+      run: swift build -v
+      working-directory: ${{env.working_directory}}
+      
+  test-docker:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: ./.github/actions/swift-test-docker

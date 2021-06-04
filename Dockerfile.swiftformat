@@ -1,0 +1,32 @@
+# MIT License
+# Copyright (c) 2020 Takuhiro Muta
+# https://github.com/417-72KI/Docker-Swift-Mint/blob/master/LICENSE
+
+ARG SWIFT_VERSION=5.4
+FROM swift:${SWIFT_VERSION}
+
+ARG MINT_REVISION=0.16.0
+ENV MINT_REVISION=${MINT_REVISION}
+
+ARG SWIFT_FORMAT_REVISION=0.46.2
+ENV SWIFT_FORMAT_REVISION=${SWIFT_FORMAT_REVISION}
+
+# Install Mint
+RUN git clone -b "${MINT_REVISION}" --depth 1 "https://github.com/yonaskolb/Mint.git" ~/Mint && \
+    cd ~/Mint && \
+    swift build --disable-sandbox -c release && \
+    mkdir -p /usr/local/bin && \
+    cp -f .build/release/mint /usr/local/bin/mint && \
+    cd && \
+    rm -rf ~/Mint
+
+RUN mint install nicklockwood/SwiftFormat@${SWIFT_FORMAT_REVISION}
+
+ENV APP_HOME /app
+WORKDIR $APP_HOME
+
+COPY . .
+
+WORKDIR /app/Repl
+
+CMD ["swiftformat", "."]
