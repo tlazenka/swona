@@ -1,10 +1,8 @@
-FROM swift:5.3
+FROM swift:5.4
 
 ENV APP_HOME /app
 WORKDIR $APP_HOME
 
 COPY . .
-
-WORKDIR /app/Repl
 
 CMD ["swift", "build"]

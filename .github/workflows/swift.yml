@@ -31,11 +31,9 @@ jobs:
     steps:
      - name: Install Mint
        run: brew install mint
-     - name: Install SwiftFormat
-       run: mint install nicklockwood/SwiftFormat@0.46.2
      - uses: actions/checkout@v2
      - name: Run SwiftFormat lint
-       run: swiftformat --lint .
+       run: mint run nicklockwood/SwiftFormat@0.46.2 --lint .
 
   repl:
 
@@ -48,3 +46,11 @@ jobs:
     - name: Build
       run: swift build -v
       working-directory: ${{env.working_directory}}
+      
+  test-docker:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: ./.github/actions/swift-test-docker
