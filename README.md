@@ -1,6 +1,6 @@
 # Swona
 
-A Swift port of the lovely [Siilinkari](https://github.com/komu/siilinkari).
+A Swift port of the lovely [Siilinkari](https://github.com/komu/siilinkari). Examples of `@dynamicMemberLookup` and `@dynamicCallable`.
 
 ## Launch the REPL
 
