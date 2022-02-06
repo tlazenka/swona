@@ -6,12 +6,12 @@ on:
   pull_request:
     branches: [ develop ]
 env:
-  DEVELOPER_DIR: /Applications/Xcode_12.app/Contents/Developer
+  DEVELOPER_DIR: /Applications/Xcode_13.2.1.app/Contents/Developer
 
 jobs:
   test:
 
-    runs-on: macos-latest
+    runs-on: macos-11.0
     env:
       working_directory: ./
 
@@ -26,18 +26,18 @@ jobs:
 
   format:
 
-    runs-on: macos-latest
+    runs-on: macos-11.0
 
     steps:
      - name: Install Mint
-       run: brew install mint
+       run: brew list mint &>/dev/null || brew install mint
      - uses: actions/checkout@v2
      - name: Run SwiftFormat lint
        run: mint run nicklockwood/SwiftFormat@0.46.2 --lint .
 
   repl:
 
-    runs-on: macos-latest
+    runs-on: macos-11.0
     env:
       working_directory: ./Repl
 

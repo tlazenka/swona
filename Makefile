@@ -13,3 +13,7 @@ test-docker:
 .PHONY: format-docker
 format-docker:
 	docker-compose run --rm format
+
+.PHONY: repl-docker
+repl-docker:
+	docker-compose run --rm repl
