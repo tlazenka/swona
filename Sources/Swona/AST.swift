@@ -1,4 +1,4 @@
-/**
+/* 
  * Represents expressions of the program.
  *
  * In addition to the logical structure of the source code, each expression
@@ -168,5 +168,7 @@ public enum RelationalOp: String, CustomStringConvertible {
     case greaterThan = ">"
     case greaterThanOrEqual = ">="
 
-    public var description: String { rawValue }
+    public var description: String {
+        rawValue
+    }
 }

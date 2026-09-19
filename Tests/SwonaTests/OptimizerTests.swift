@@ -113,5 +113,4 @@ import XCTest
 
         XCTAssertEqual([IR.add, IR.multiply], block.opCodes)
     }
-
 }

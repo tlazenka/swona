@@ -55,7 +55,7 @@ import XCTest
         try assertParseExpression(source: "{ x; y; z }", expected: "[ExpressionList [[Ref x], [Ref y], [Ref z]]]")
     }
 
-    func testAssignmentToLiteralIsSyntaxError() throws {
+    func testAssignmentToLiteralIsSyntaxError() {
         assertSyntaxError(code: "1 = bar;")
     }
 
@@ -158,6 +158,4 @@ import XCTest
 
         XCTAssertEqual(expected, expression.description, source)
     }
-
-
 }

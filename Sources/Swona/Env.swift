@@ -75,10 +75,21 @@ public class BindingReference: Hashable, CustomStringConvertible {
         self.binding = binding
     }
 
-    public var type: Type { binding.type }
-    public var name: String { binding.name }
-    public var description: String { binding.description }
-    public var mutable: Bool { binding.mutable }
+    public var type: Type {
+        binding.type
+    }
+
+    public var name: String {
+        binding.name
+    }
+
+    public var description: String {
+        binding.description
+    }
+
+    public var mutable: Bool {
+        binding.mutable
+    }
 }
 
 /**
@@ -160,7 +171,9 @@ extension StaticEnvironment {
 public class GlobalStaticEnvironment: StaticEnvironment {
     private var bindingIndexSequence = 0
 
-    public var parent: StaticEnvironment? { nil }
+    public var parent: StaticEnvironment? {
+        nil
+    }
 
     public var bindings: [String: BindingReference] = [:]
 
@@ -200,7 +213,7 @@ class LocalFrameEnvironment: StaticEnvironment {
 
     init(parent: StaticEnvironment, args: [(String, Type)]) {
         self.parent = parent
-        args.enumerated().forEach { index, pair in
+        for (index, pair) in args.enumerated() {
             let (name, type) = pair
             bindings[name] = BindingReference(binding: Binding.argument(name: name, type: type, index: index))
         }

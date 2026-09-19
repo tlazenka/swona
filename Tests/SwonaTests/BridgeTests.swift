@@ -27,7 +27,7 @@ import XCTest
         let array = try b.stringArrayOfSize(2.lit, "empty".lit)
         b.x = array
         let value: Value? = b.x
-        guard case let .array(elements, elementType) = value! else {
+        guard case let .array(elements, elementType) = try XCTUnwrap(value) else {
             XCTFail()
             return
         }
@@ -46,7 +46,7 @@ import XCTest
         XCTAssertEqual(result, "element0".value)
     }
 
-    func testCallAsFunction() throws {
+    func testCallAsFunction() {
         let inc = fun1(name: "inc", argType: .int, returnType: .int, func: {
             arg in
             guard case let .integer(value) = arg else {
@@ -60,7 +60,7 @@ import XCTest
         XCTAssertEqual(result as? Value, Value(integerLiteral: 2))
     }
 
-    func testValueArray() throws {
+    func testValueArray() {
         let array: Value = ["item1", "item2", "item3"]
         guard case let .array(elements, elementType) = array, elementType == .string else {
             XCTFail("Invalid value array")
@@ -69,5 +69,4 @@ import XCTest
 
         XCTAssertEqual(elements.array, ["item1".value, "item2".value, "item3".value])
     }
-
 }

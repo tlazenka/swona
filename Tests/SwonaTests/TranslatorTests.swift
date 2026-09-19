@@ -187,5 +187,4 @@ import XCTest
         let expectedInstructions = expectedInstructionsAsString.lines().map { $0.trimmingCharacters(in: NSCharacterSet.whitespacesAndNewlines) }
         XCTAssertEqual(instructions, expectedInstructions)
     }
-
 }

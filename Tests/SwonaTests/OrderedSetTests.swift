@@ -155,8 +155,8 @@ import XCTest
         XCTAssertNotEqual(OrderedSet(["3", "2", "1"]), OrderedSet(["2", "1"]))
     }
 
-    // See https://github.com/apple/swift-package-manager/blob/927a57c33cf105748977f4d066a08f84372a87ac/Tests/BasicTests/OrderedSetTests.swift
-    // Modified from Swift Package Manager (Apache License, Version 2.0). See LICENSE in this repo
+    /// See https://github.com/apple/swift-package-manager/blob/927a57c33cf105748977f4d066a08f84372a87ac/Tests/BasicTests/OrderedSetTests.swift
+    /// Modified from Swift Package Manager (Apache License, Version 2.0). See LICENSE in this repo
     func testOrderedSetBasics() {
         // Create an empty set.
         var set = OrderedSet<String>()
@@ -186,5 +186,4 @@ import XCTest
         XCTAssertEqual(set[1], "two")
         XCTAssert(three)
     }
-
 }

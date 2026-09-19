@@ -2,13 +2,13 @@ import Swona
 import XCTest
 
 @MainActor final class LexerTests: XCTestCase {
-    func testEmptySourceHasNoTokens() throws {
+    func testEmptySourceHasNoTokens() {
         assertNoTokens(source: "")
         assertNoTokens(source: "  ")
         assertNoTokens(source: "  \n \n \t \t ")
     }
 
-    func testKeywords() throws {
+    func testKeywords() {
         assertTokens(source: "if", tokens: Token.keyword(Token.Keyword.if))
         assertTokens(source: "else", tokens: Token.keyword(Token.Keyword.else))
         assertTokens(source: "fun", tokens: Token.keyword(Token.Keyword.fun))
@@ -22,7 +22,7 @@ import XCTest
         assertTokens(source: "bar", tokens: Token.identifier(name: "bar"))
     }
 
-    func testOperators() throws {
+    func testOperators() {
         assertTokens(source: "+", tokens: Token.operator(Token.Operator.plus))
         assertTokens(source: "-", tokens: Token.operator(Token.Operator.minus))
         assertTokens(source: "*", tokens: Token.operator(Token.Operator.multiply))
@@ -38,7 +38,7 @@ import XCTest
         assertTokens(source: "||", tokens: Token.operator(Token.Operator.or))
     }
 
-    func testPunctuation() throws {
+    func testPunctuation() {
         assertTokens(source: "(", tokens: Token.punctuation(Token.Punctuation.leftParen))
         assertTokens(source: ")", tokens: Token.punctuation(Token.Punctuation.rightParen))
         assertTokens(source: "{", tokens: Token.punctuation(Token.Punctuation.leftBrace))
@@ -64,15 +64,15 @@ import XCTest
         assertTokens(source: "\"bar \\\"baz\\\" quux\"", tokens: Token.literal(value: Value.string(value: "bar \"baz\" quux")))
     }
 
-    func testUnterminatedStringLiteral() throws {
+    func testUnterminatedStringLiteral() {
         assertSyntaxError(source: "\"bar")
     }
 
-    func testUnexpectedCharacter() throws {
+    func testUnexpectedCharacter() {
         assertSyntaxError(source: "€")
     }
 
-    func testMultipleTokens() throws {
+    func testMultipleTokens() {
         assertTokens(source: "if (foo) \"bar\" else 42",
                      tokens: Token.keyword(.if), .punctuation(.leftParen), .identifier(name: "foo"), .punctuation(.rightParen), .literal(value: Value.string(value: "bar")), .keyword(.else), .literal(value: Value.integer(value: 42)))
     }
@@ -101,7 +101,7 @@ import XCTest
     }
 
     private func assertTokens(source: String, tokens: Token...) {
-        XCTAssertTrue(tokens.elementsEqual(try readAllTokens(source: source).map(\.token)))
+        XCTAssertTrue(try tokens.elementsEqual(readAllTokens(source: source).map(\.token)))
     }
 
     private func assertNoTokens(source: String) {
@@ -121,7 +121,7 @@ import XCTest
         var result = [TokenInfo]()
 
         while lexer.hasMore {
-            result.append(try lexer.readToken())
+            try result.append(lexer.readToken())
         }
 
         return result
@@ -189,7 +189,7 @@ import XCTest
         XCTAssert(thrownError is SyntaxErrorException)
     }
 
-    func testDefaultToStringProvidesBasicInfo() throws {
+    func testDefaultToStringProvidesBasicInfo() {
         let location = SourceLocation(file: "dummy.sk", line: 42, column: 14, lineText: "    if (foo) bar() else baz()")
 
         XCTAssertEqual("[dummy.sk:42:14]", location.description)
@@ -204,6 +204,4 @@ import XCTest
 
         """, location.toLongString())
     }
-
-
 }

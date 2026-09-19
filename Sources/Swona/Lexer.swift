@@ -1,4 +1,4 @@
-/**
+/* 
  * Represents a location in source code.
  *
  * In addition to actual location (file name and position in file) the class also
@@ -18,7 +18,9 @@ public struct SourceLocation: Equatable, CustomStringConvertible {
     /**
      * Returns single line representation of the location.
      */
-    public var description: String { "[\(file.description):\(line.description):\(column.description)]" }
+    public var description: String {
+        "[\(file.description):\(line.description):\(column.description)]"
+    }
 
     /**
      * Returns two line representation of the location.
@@ -106,7 +108,9 @@ public enum Token: Equatable, CustomStringConvertible {
         case val = "val"
         case `while` = "while"
 
-        public var description: String { rawValue.description }
+        public var description: String {
+            rawValue.description
+        }
     }
 
     public enum Operator: String, CaseIterable, CustomStringConvertible {
@@ -124,7 +128,9 @@ public enum Token: Equatable, CustomStringConvertible {
         case and = "&&"
         case or = "||"
 
-        public var description: String { rawValue.description }
+        public var description: String {
+            rawValue.description
+        }
     }
 
     public enum Punctuation: String, CaseIterable, CustomStringConvertible {
@@ -137,7 +143,9 @@ public enum Token: Equatable, CustomStringConvertible {
         case semicolon = ";"
         case comma = ","
 
-        public var description: String { "'\(rawValue.description)'" }
+        public var description: String {
+            "'\(rawValue.description)'"
+        }
     }
 
     public var description: String {
@@ -162,7 +170,9 @@ public enum Token: Equatable, CustomStringConvertible {
 public struct TokenInfo: CustomStringConvertible {
     public let token: Token
     public let location: SourceLocation
-    public var description: String { "[TokenInfo \(token) \(location)]" }
+    public var description: String {
+        "[TokenInfo \(token) \(location)]"
+    }
 }
 
 /**
@@ -220,21 +230,35 @@ public class Lexer {
         let ch = try peekChar()
 
         let token: Token = try {
-            if ch.isLetter { return try readSymbol() }
-            else if ch.isWholeNumber { return try readNumber() }
-            else if ch == "\"" { return try readString() }
-            else if try readIf(ch: "+") { return .operator(.plus) }
-            else if try readIf(ch: "-") { return .operator(.minus) }
-            else if try readIf(ch: "*") { return .operator(.multiply) }
-            else if try readIf(ch: "/") { return .operator(.divide) }
-            else if try readIf(ch: "(") { return .punctuation(.leftParen) }
-            else if try readIf(ch: ")") { return .punctuation(.rightParen) }
-            else if try readIf(ch: "{") { return .punctuation(.leftBrace) }
-            else if try readIf(ch: "}") { return .punctuation(.rightBrace) }
-            else if try readIf(ch: ":") { return .punctuation(.colon) }
-            else if try readIf(ch: ";") { return .punctuation(.semicolon) }
-            else if try readIf(ch: ",") { return .punctuation(.comma) }
-            else if try readIf(ch: "=") {
+            if ch.isLetter {
+                return try readSymbol()
+            } else if ch.isWholeNumber {
+                return try readNumber()
+            } else if ch == "\"" {
+                return try readString()
+            } else if try readIf(ch: "+") {
+                return .operator(.plus)
+            } else if try readIf(ch: "-") {
+                return .operator(.minus)
+            } else if try readIf(ch: "*") {
+                return .operator(.multiply)
+            } else if try readIf(ch: "/") {
+                return .operator(.divide)
+            } else if try readIf(ch: "(") {
+                return .punctuation(.leftParen)
+            } else if try readIf(ch: ")") {
+                return .punctuation(.rightParen)
+            } else if try readIf(ch: "{") {
+                return .punctuation(.leftBrace)
+            } else if try readIf(ch: "}") {
+                return .punctuation(.rightBrace)
+            } else if try readIf(ch: ":") {
+                return .punctuation(.colon)
+            } else if try readIf(ch: ";") {
+                return .punctuation(.semicolon)
+            } else if try readIf(ch: ",") {
+                return .punctuation(.comma)
+            } else if try readIf(ch: "=") {
                 if try readIf(ch: "=") {
                     return .operator(.equalEqual)
                 } else {
@@ -479,7 +503,7 @@ public class LookaheadLexer {
      * Convenience constructor that creates the wrapped [Lexer] using given [source].
      */
     public convenience init(source: String) throws {
-        self.init(lexer: try Lexer(source: source))
+        try self.init(lexer: Lexer(source: source))
     }
 
     /**
@@ -503,7 +527,7 @@ public class LookaheadLexer {
      * Consumes and returns the next token.
      */
     @discardableResult public func readToken() throws -> TokenInfo {
-        guard let lookahead = self.lookahead else {
+        guard let lookahead = lookahead else {
             return try lexer.readToken()
         }
         self.lookahead = nil

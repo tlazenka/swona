@@ -8,7 +8,7 @@ public struct DataSegment: CustomStringConvertible {
     private var bindings = [Value?](repeating: nil, count: 1024)
 
     subscript(index: Int) -> Value {
-        /**
+        /* 
          * Assigns a new value to existing variable.
          */
         set(value) {
@@ -16,7 +16,7 @@ public struct DataSegment: CustomStringConvertible {
             bindings[index] = value
         }
 
-        /**
+        /* 
          * Returns the value bound to given variable.
          */
         get {
@@ -247,14 +247,14 @@ struct ThreadState: CustomStringConvertible {
     var fp = 0
 
     subscript(offset: Int) -> Value {
-        /**
+        /* 
          * Accesses data relative to current frame.
          */
         get {
             stack[fp, offset]
         }
 
-        /**
+        /* 
          * Accesses data relative to current frame.
          */
         set(value) {
@@ -275,7 +275,7 @@ struct ThreadState: CustomStringConvertible {
         return values
     }
 
-    public var description: String {
+    var description: String {
         "  pc = \(pc)\n  fp = \(fp)\n  data = \(stack)"
     }
 
@@ -336,7 +336,7 @@ public class Evaluator {
             return EvaluationResult(value: Value.unit, type: Type.unit)
         } else {
             let (segment, type) = try translate(code: code)
-            return EvaluationResult(value: try evaluateSegment(segment: segment), type: type)
+            return try EvaluationResult(value: evaluateSegment(segment: segment), type: type)
         }
     }
 
@@ -415,7 +415,7 @@ public class Evaluator {
      */
     private func translate(code: String) throws -> (CodeSegment, Type) {
         let exp = try parseAndTypeCheck(code: code)
-        return (try translate(exp: exp), exp.type)
+        return try (translate(exp: exp), exp.type)
     }
 
     public func translate(exp: TypedExpression) throws -> CodeSegment {

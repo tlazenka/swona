@@ -21,7 +21,7 @@ import XCTest
 
     var env: StaticEnvironment = GlobalStaticEnvironment()
 
-    func testLiteralTypes() throws {
+    func testLiteralTypes() {
         assertType(expectedType: Type.string, code: "\"foo\"")
         assertType(expectedType: Type.int, code: "123")
         assertType(expectedType: Type.boolean, code: "true")
@@ -35,12 +35,12 @@ import XCTest
         assertType(expectedType: Type.boolean, code: "b")
     }
 
-    func testNot() throws {
+    func testNot() {
         assertType(expectedType: Type.boolean, code: "!true")
         assertTypeCheckFails(code: "!1")
     }
 
-    func testEqualityComparison() throws {
+    func testEqualityComparison() {
         assertType(expectedType: Type.boolean, code: "true == false")
         assertType(expectedType: Type.boolean, code: "1 == 1")
         assertType(expectedType: Type.boolean, code: "\"foo\" == \"bar\"")
@@ -53,7 +53,7 @@ import XCTest
         assertTypeCheckFails(code: "true != 1")
     }
 
-    func testNumericOperators() throws {
+    func testNumericOperators() {
         assertType(expectedType: Type.int, code: "1 + 1")
         assertType(expectedType: Type.int, code: "1 - 1")
 
@@ -69,30 +69,30 @@ import XCTest
         assertTypeCheckFails(code: "\"foo\" - \"bar\"")
     }
 
-    func testIfWithoutElseProducesUnit() throws {
+    func testIfWithoutElseProducesUnit() {
         assertType(expectedType: Type.unit, code: "if (true) 42")
     }
 
-    func testIfWithIncompatibleTypesProducesUnit() throws {
+    func testIfWithIncompatibleTypesProducesUnit() {
         assertType(expectedType: Type.unit, code: "if (true) 42 else false")
     }
 
-    func testTypeOfEmptyExpressionListIsUnit() throws {
+    func testTypeOfEmptyExpressionListIsUnit() {
         assertType(expectedType: Type.unit, code: "{}")
     }
 
-    func testTypeOfNonEmptyExpressionListIsTypeOfLast() throws {
+    func testTypeOfNonEmptyExpressionListIsTypeOfLast() {
         assertType(expectedType: Type.int, code: "{ 1 }")
         assertType(expectedType: Type.string, code: "{ 1; \"\" }")
         assertType(expectedType: Type.int, code: "{ 1; \"\"; 3 }")
     }
 
-    func testIfWithCompatibleTypesReturnsTheCommonType() throws {
+    func testIfWithCompatibleTypesReturnsTheCommonType() {
         assertType(expectedType: Type.int, code: "if (true) 42 else 31")
         assertType(expectedType: Type.string, code: "if (true) \"foo\" else \"bar\"")
     }
 
-    func testPlusWithStringLiteral() throws {
+    func testPlusWithStringLiteral() {
         assertType(expectedType: Type.string, code: "\"foo\" + \"bar\"")
         assertType(expectedType: Type.string, code: "\"foo\" + 42")
         assertType(expectedType: Type.string, code: "\"foo\" + true")
@@ -116,7 +116,7 @@ import XCTest
         """)
     }
 
-    func testVariablesDefinedByNestedEnvironmentAreNotVisibleOutside() throws {
+    func testVariablesDefinedByNestedEnvironmentAreNotVisibleOutside() {
         assertTypeCheckFails(code: """
                 if (true) {
                     if (true) {
@@ -127,25 +127,25 @@ import XCTest
         """)
     }
 
-    func testUnboundVariables() throws {
+    func testUnboundVariables() {
         assertTypeCheckFails(code: "x")
         assertTypeCheckFails(code: "x = 4")
     }
 
-    func testEvaluationFailsForRebindingVariables() throws {
+    func testEvaluationFailsForRebindingVariables() {
         assertTypeCheckFails(code: "{ var x = 4; var x = 4 }")
     }
 
-    func testUnboundVariableType() throws {
+    func testUnboundVariableType() {
         assertTypeCheckFails(code: "s")
     }
 
-    func testAssigningToParameters() throws {
+    func testAssigningToParameters() {
         env = GlobalStaticEnvironment().newScope(args: [("foo", Type.int)])
         assertTypeCheckFails(code: "foo = 42")
     }
 
-    func testAssignmentToImmutableVariables() throws {
+    func testAssignmentToImmutableVariables() {
         assertTypeCheckFails(code: """
                 if (true) {
                     val x = 4;
@@ -191,6 +191,4 @@ import XCTest
     @discardableResult private func typeCheck(code: String) throws -> TypedExpression {
         try parseExpression(code: code).typeCheck(env: env)
     }
-
-
 }

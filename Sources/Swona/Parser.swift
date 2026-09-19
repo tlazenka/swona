@@ -4,7 +4,7 @@
  * @throws SyntaxErrorException if parsing fails
  */
 public func parseExpression(code: String) throws -> Expression {
-    try parseComplete(lexer: try Lexer(source: code)) { try $0.parseTopLevelExpression() }
+    try parseComplete(lexer: Lexer(source: code)) { try $0.parseTopLevelExpression() }
 }
 
 /**
@@ -47,7 +47,7 @@ public class Parser {
         var result = [FunctionDefinition]()
 
         while lexer.hasMore {
-            result += [try parseFunctionDefinition()]
+            try result += [parseFunctionDefinition()]
         }
 
         return result
@@ -109,7 +109,6 @@ public class Parser {
             } else {
                 return exp
             }
-
         default:
             break
         }
@@ -128,7 +127,7 @@ public class Parser {
         while lexer.hasMore {
             let location = try lexer.nextTokenLocation()
             if try lexer.readNextIf(token: .operator(.or)) {
-                exp = Expression.binary(.or(lhs: exp, rhs: try parseExpression2(), location: location))
+                exp = try Expression.binary(.or(lhs: exp, rhs: parseExpression2(), location: location))
             } else {
                 return exp
             }
@@ -147,7 +146,7 @@ public class Parser {
         while lexer.hasMore {
             let location = try lexer.nextTokenLocation()
             if try lexer.readNextIf(token: .operator(.and)) {
-                exp = Expression.binary(.and(lhs: exp, rhs: try parseExpression3(), location: location))
+                exp = try Expression.binary(.and(lhs: exp, rhs: parseExpression3(), location: location))
             } else {
                 return exp
             }
@@ -167,9 +166,9 @@ public class Parser {
         while lexer.hasMore {
             let location = try lexer.nextTokenLocation()
             if try lexer.readNextIf(token: .operator(.equalEqual)) {
-                exp = Expression.binary(.relational(op: .equals, lhs: exp, rhs: try parseExpression4(), location: location))
+                exp = try Expression.binary(.relational(op: .equals, lhs: exp, rhs: parseExpression4(), location: location))
             } else if try lexer.readNextIf(token: .operator(.notEqual)) {
-                exp = Expression.binary(.relational(op: .notEquals, lhs: exp, rhs: try parseExpression4(), location: location))
+                exp = try Expression.binary(.relational(op: .notEquals, lhs: exp, rhs: parseExpression4(), location: location))
             } else {
                 return exp
             }
@@ -189,13 +188,13 @@ public class Parser {
         while lexer.hasMore {
             let location = try lexer.nextTokenLocation()
             if try lexer.readNextIf(token: .operator(.lessThan)) {
-                exp = Expression.binary(.relational(op: .lessThan, lhs: exp, rhs: try parseExpression5(), location: location))
+                exp = try Expression.binary(.relational(op: .lessThan, lhs: exp, rhs: parseExpression5(), location: location))
             } else if try lexer.readNextIf(token: .operator(.lessThanOrEqual)) {
-                exp = Expression.binary(.relational(op: .lessThanOrEqual, lhs: exp, rhs: try parseExpression5(), location: location))
+                exp = try Expression.binary(.relational(op: .lessThanOrEqual, lhs: exp, rhs: parseExpression5(), location: location))
             } else if try lexer.readNextIf(token: .operator(.greaterThan)) {
-                exp = Expression.binary(.relational(op: .greaterThan, lhs: exp, rhs: try parseExpression5(), location: location))
+                exp = try Expression.binary(.relational(op: .greaterThan, lhs: exp, rhs: parseExpression5(), location: location))
             } else if try lexer.readNextIf(token: .operator(.greaterThanOrEqual)) {
-                exp = Expression.binary(.relational(op: .greaterThanOrEqual, lhs: exp, rhs: try parseExpression5(), location: location))
+                exp = try Expression.binary(.relational(op: .greaterThanOrEqual, lhs: exp, rhs: parseExpression5(), location: location))
             } else {
                 return exp
             }
@@ -215,9 +214,9 @@ public class Parser {
         while lexer.hasMore {
             let location = try lexer.nextTokenLocation()
             if try lexer.readNextIf(token: .operator(.plus)) {
-                exp = Expression.binary(.plus(lhs: exp, rhs: try parseExpression6(), location: location))
+                exp = try Expression.binary(.plus(lhs: exp, rhs: parseExpression6(), location: location))
             } else if try lexer.readNextIf(token: .operator(.minus)) {
-                exp = Expression.binary(.minus(lhs: exp, rhs: try parseExpression6(), location: location))
+                exp = try Expression.binary(.minus(lhs: exp, rhs: parseExpression6(), location: location))
             } else {
                 return exp
             }
@@ -237,9 +236,9 @@ public class Parser {
         while lexer.hasMore {
             let location = try lexer.nextTokenLocation()
             if try lexer.readNextIf(token: .operator(.multiply)) {
-                exp = Expression.binary(.multiply(lhs: exp, rhs: try parseExpression7(), location: location))
+                exp = try Expression.binary(.multiply(lhs: exp, rhs: parseExpression7(), location: location))
             } else if try lexer.readNextIf(token: .operator(.divide)) {
-                exp = Expression.binary(.divide(lhs: exp, rhs: try parseExpression7(), location: location))
+                exp = try Expression.binary(.divide(lhs: exp, rhs: parseExpression7(), location: location))
             } else {
                 return exp
             }
@@ -257,7 +256,7 @@ public class Parser {
         let exp = try parseExpression8()
 
         if try lexer.nextTokenIs(token: .punctuation(.leftParen)) {
-            return Expression.call(func: exp, args: try parseArgumentList())
+            return try Expression.call(func: exp, args: parseArgumentList())
         } else {
             return exp
         }
@@ -403,7 +402,7 @@ public class Parser {
             } else {
                 var args = [Expression]()
                 repeat {
-                    args.append(try parseTopLevelExpression())
+                    try args.append(parseTopLevelExpression())
                 } while try lexer.readNextIf(token: .punctuation(.comma))
                 return args
             }

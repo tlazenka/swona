@@ -211,20 +211,20 @@ public class FunctionReference: Hashable {
 
 // Helper properties to make values easily out of Kotlin literals. (e.g. "foo".value or 123.value)
 
-extension String {
-    public var value: Value {
+public extension String {
+    var value: Value {
         .string(value: self)
     }
 }
 
-extension Int {
-    public var value: Value {
+public extension Int {
+    var value: Value {
         .integer(value: self)
     }
 }
 
-extension Bool {
-    public var value: Value {
+public extension Bool {
+    var value: Value {
         .bool(value: self)
     }
 }

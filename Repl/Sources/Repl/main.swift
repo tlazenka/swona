@@ -2,7 +2,7 @@ import Foundation
 import LineNoise
 import Swona
 
-/**
+/* 
  * Implementation of Read-Eval-Print loop.
  */
 
@@ -29,7 +29,7 @@ extension Evaluator {
     }
 }
 
-// Modified from Kotlin (Apache License, Version 2.0). See LICENSE-THIRD-PARTY in this repo
+/// Modified from Kotlin (Apache License, Version 2.0). See LICENSE-THIRD-PARTY in this repo
 func measureTimeMillis(block: () throws -> Void) throws -> UInt64 {
     let start = DispatchTime.now()
     try block()
@@ -88,7 +88,7 @@ while true {
 
     do {
         if line.hasPrefix(":dump ") {
-            print(try evaluator.dump(code: String(line.dropFirst(":dump ".count))))
+            try print(evaluator.dump(code: String(line.dropFirst(":dump ".count))))
         } else {
             while true {
                 do {

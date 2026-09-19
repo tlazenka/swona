@@ -1,4 +1,4 @@
-/**
+/* 
  * Intermediate representation that is quite close to executed opcodes,
  * but leaves things like addresses and labels still abstract.
  */
@@ -472,7 +472,7 @@ class FunctionTranslator {
             basicBlocks.optimize()
         }
 
-        return (Type.Function.function(argumentTypes: `func`.args.map(\.1), returnType: typedExp.type), try basicBlocks.translateToCode(argumentCount: `func`.args.count))
+        return try (Type.Function.function(argumentTypes: `func`.args.map(\.1), returnType: typedExp.type), basicBlocks.translateToCode(argumentCount: `func`.args.count))
     }
 }
 
@@ -511,7 +511,7 @@ public class Translator {
             currentBlock += IR.restoreFrame
         case let .expressionList(expressions, _):
             currentBlock += IR.pushUnit
-            expressions.forEach { expression in
+            for expression in expressions {
                 currentBlock += IR.pop
                 emitCode(typedExpression: expression)
             }
@@ -557,7 +557,6 @@ public class Translator {
 
             currentBlock = afterBlock
         case let .while(condition, body):
-
             let loopHead = BasicBlock()
             let loopBody = BasicBlock()
             let afterLoop = BasicBlock()

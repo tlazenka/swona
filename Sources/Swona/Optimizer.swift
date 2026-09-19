@@ -1,13 +1,13 @@
-extension TypedExpression {
-    public func optimize() -> TypedExpression {
+public extension TypedExpression {
+    func optimize() -> TypedExpression {
         evaluateConstantExpressions()
     }
 
-    public func evaluateConstantExpressions() -> TypedExpression {
+    func evaluateConstantExpressions() -> TypedExpression {
         eval(env: ConstantBindingEnv())
     }
 
-    fileprivate func eval(env: ConstantBindingEnv) -> TypedExpression {
+    private func eval(env: ConstantBindingEnv) -> TypedExpression {
         switch self {
         case let .ref(bindingReference):
             guard let result = env[bindingReference] else {
@@ -153,12 +153,12 @@ private class ConstantBindingEnv {
     }
 }
 
-extension BasicBlock {
+public extension BasicBlock {
     /**
      * Performs local optimizations to IR by looking at a small window of successive
      * instructions.
      */
-    public func peepholeOptimize() {
+    func peepholeOptimize() {
         var modified = false
         repeat {
             modified = false
@@ -197,7 +197,7 @@ private protocol PeepholeOptimizer {
 }
 
 extension PeepholeOptimizer {
-    /**
+    /* 
      * Apply optimizations to given [basicBlock].
      *
      * @return True if block was modified
@@ -232,7 +232,9 @@ extension PeepholeOptimizer {
  * Loading a variable by storing to same variable is a no-op: remove instructions.
  */
 private struct RedundantLoadStoreOptimizer: PeepholeOptimizer {
-    var windowSize: Int { 2 }
+    var windowSize: Int {
+        2
+    }
 
     func optimizeWindow(window: [IR]) -> [IR]? {
         let first = window[0]
@@ -250,7 +252,9 @@ private struct RedundantLoadStoreOptimizer: PeepholeOptimizer {
  * Storing a variable and then loading the same variable can be replaced by dup + store.
  */
 private struct RedundantLoadOptimizer: PeepholeOptimizer {
-    var windowSize: Int { 2 }
+    var windowSize: Int {
+        2
+    }
 
     func optimizeWindow(window: [IR]) -> [IR]? {
         let first = window[0]
@@ -268,7 +272,9 @@ private struct RedundantLoadOptimizer: PeepholeOptimizer {
  * Removes PushUnit + Pop -combinations
  */
 private struct RedundantPushUnitPopOptimizer: PeepholeOptimizer {
-    var windowSize: Int { 2 }
+    var windowSize: Int {
+        2
+    }
 
     func optimizeWindow(window: [IR]) -> [IR]? {
         let first = window[0]

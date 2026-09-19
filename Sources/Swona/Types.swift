@@ -240,7 +240,7 @@ public class TypeCheckException: Error {
     }
 }
 
-/**
+/* 
  * Type-checker for expressions.
  *
  * Type-checker walks through the syntax tree, maintaining a [StaticEnvironment] mapping
@@ -256,9 +256,9 @@ extension Expression {
         case let .lit(value, _):
             return TypedExpression.lit(value: value, type: value.type)
         case let .ref(name, location):
-            return .ref(bindingReference: try env.lookupBinding(name: name, location: location))
+            return try .ref(bindingReference: env.lookupBinding(name: name, location: location))
         case let .not(exp, _):
-            return TypedExpression.not(exp: try exp.typeCheckExpected(expectedType: Type.boolean, env: env))
+            return try TypedExpression.not(exp: exp.typeCheckExpected(expectedType: Type.boolean, env: env))
         case let .binary(binary):
             return try binary.typeCheck(env: env)
         case let .call(`func`, args):

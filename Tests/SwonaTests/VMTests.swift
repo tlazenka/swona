@@ -118,7 +118,7 @@ import XCTest
         try assertEvaluation(code: "!!x", expectedValue: .bool(value: true))
     }
 
-    func testEvaluationFailuresForCoercions() throws {
+    func testEvaluationFailuresForCoercions() {
         assertTypeCheckFails(s: "1 + \"foo\"")
         assertTypeCheckFails(s: "!1")
     }
@@ -152,7 +152,7 @@ import XCTest
         try assertEvaluation(code: "sub(7, 4)", expectedValue: .integer(value: 3))
     }
 
-    func testEvaluationFailsForUnboundVariables() throws {
+    func testEvaluationFailsForUnboundVariables() {
         assertTypeCheckFails(s: "x")
         assertTypeCheckFails(s: "x = 4")
     }
@@ -169,7 +169,7 @@ import XCTest
         try assertEvaluation(code: "true && true", expectedValue: Value.bool(value: true))
     }
 
-    func testEvaluationFailsForRebindingVariables() throws {
+    func testEvaluationFailsForRebindingVariables() {
         assertTypeCheckFails(s: "{ var x = 4; var x = 4 }")
     }
 
@@ -264,6 +264,4 @@ import XCTest
     @discardableResult private func evaluate(code: String) throws -> Value {
         try evaluator.evaluate(code: code).value
     }
-
-
 }

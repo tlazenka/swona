@@ -87,5 +87,4 @@ import XCTest
         XCTAssertEqual("a".padStart(count: 4, padChar: "."), "...a")
         XCTAssertEqual("ab".padStart(count: 4, padChar: "."), "..ab")
     }
-
 }

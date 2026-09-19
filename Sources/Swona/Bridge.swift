@@ -54,18 +54,18 @@ public struct BridgeRuntimeFunction {
     }
 }
 
-extension String {
-    public var lit: Expression {
+public extension String {
+    var lit: Expression {
         Expression.lit(value: value, location: bridgeSourceLocation())
     }
 
-    public var ref: Expression {
+    var ref: Expression {
         Expression.ref(name: self, location: bridgeSourceLocation())
     }
 }
 
-extension Int {
-    public var lit: Expression {
+public extension Int {
+    var lit: Expression {
         Expression.lit(value: value, location: bridgeSourceLocation())
     }
 }
@@ -74,8 +74,8 @@ func bridgeSourceLocation(file: String = #file) -> SourceLocation {
     SourceLocation(file: file, line: 0, column: 0, lineText: "")
 }
 
-extension Value.Function {
-    public func callAsFunction(_ values: Value...) -> Any {
+public extension Value.Function {
+    func callAsFunction(_ values: Value...) -> Any {
         switch self {
         case .compound:
             fatalError("Cannot call compound function")

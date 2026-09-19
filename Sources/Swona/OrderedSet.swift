@@ -38,7 +38,9 @@ public struct OrderedSet<E: Hashable>: Equatable, @MainActor Collection {
     }
 
     /// Returns the contents of the set as an array.
-    public var contents: [Element] { array }
+    public var contents: [Element] {
+        array
+    }
 
     /// Adds an element to the ordered set.
     ///
@@ -86,8 +88,14 @@ extension OrderedSet: ExpressibleByArrayLiteral {
 }
 
 extension OrderedSet: RandomAccessCollection {
-    public var startIndex: Int { contents.startIndex }
-    public var endIndex: Int { contents.endIndex }
+    public var startIndex: Int {
+        contents.startIndex
+    }
+
+    public var endIndex: Int {
+        contents.endIndex
+    }
+
     public subscript(index: Int) -> Element {
         contents[index]
     }
