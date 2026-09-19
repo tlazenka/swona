@@ -1,7 +1,7 @@
 import XCTest
 @testable import Swona
 
-final class ExtensionsTests: XCTestCase {
+@MainActor final class ExtensionsTests: XCTestCase {
     func testSingles() {
         XCTAssertNil([].singleOrNull())
         XCTAssertNil([1, 2].singleOrNull())
@@ -88,14 +88,4 @@ final class ExtensionsTests: XCTestCase {
         XCTAssertEqual("ab".padStart(count: 4, padChar: "."), "..ab")
     }
 
-    static var allTests = [
-        ("testSingles", testSingles),
-        ("testSumBy", testSumBy),
-        ("testSubList", testSubList),
-        ("testBoolInt", testBoolInt),
-        ("testSubstring", testSubstring),
-        ("testLines", testLines),
-        ("testPadEnd", testPadEnd),
-        ("testPadStart", testPadStart),
-    ]
 }

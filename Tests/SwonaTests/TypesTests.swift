@@ -1,7 +1,7 @@
 import Swona
 import XCTest
 
-final class TypesTests: XCTestCase {
+@MainActor final class TypesTests: XCTestCase {
     func testPrimitiveTypeToString() {
         XCTAssertEqual("String", Type.string.description)
         XCTAssertEqual("Int", Type.int.description)
@@ -192,30 +192,5 @@ final class TypesTests: XCTestCase {
         try parseExpression(code: code).typeCheck(env: env)
     }
 
-    static var allTests = [
-        ("testPrimitiveTypeToString", testPrimitiveTypeToString),
-        ("testFunctionTypeToString", testFunctionTypeToString),
-        ("testArrayTypeToString", testArrayTypeToString),
-        ("testLiteralTypes", testLiteralTypes),
-        ("testBoundVariableTypes", testBoundVariableTypes),
-        ("testNot", testNot),
-        ("testEqualityComparison", testEqualityComparison),
-        ("testNumericOperators", testNumericOperators),
-        ("testIfWithoutElseProducesUnit", testIfWithoutElseProducesUnit),
-        ("testIfWithIncompatibleTypesProducesUnit", testIfWithIncompatibleTypesProducesUnit),
-        ("testTypeOfEmptyExpressionListIsUnit", testTypeOfEmptyExpressionListIsUnit),
-        ("testTypeOfNonEmptyExpressionListIsTypeOfLast", testTypeOfNonEmptyExpressionListIsTypeOfLast),
-        ("testIfWithCompatibleTypesReturnsTheCommonType", testIfWithCompatibleTypesReturnsTheCommonType),
-        ("testPlusWithStringLiteral", testPlusWithStringLiteral),
-        ("testVariableCanBeReboundInNestedEnvironment", testVariableCanBeReboundInNestedEnvironment),
-        ("testVariableIsVisibleInNestedEnvironment", testVariableIsVisibleInNestedEnvironment),
-        ("testVariablesDefinedByNestedEnvironmentAreNotVisibleOutside", testVariablesDefinedByNestedEnvironmentAreNotVisibleOutside),
-        ("testUnboundVariables", testUnboundVariables),
-        ("testEvaluationFailsForRebindingVariables", testEvaluationFailsForRebindingVariables),
-        ("testUnboundVariableType", testUnboundVariableType),
-        ("testAssigningToParameters", testAssigningToParameters),
-        ("testAssignmentToImmutableVariables", testAssignmentToImmutableVariables),
-        ("testRelationalOperatorsAreNotSupportedForUnit", testRelationalOperatorsAreNotSupportedForUnit),
-        ("testRelationalOperatorsAreNotSupportedForFunctions", testRelationalOperatorsAreNotSupportedForFunctions),
-    ]
+
 }

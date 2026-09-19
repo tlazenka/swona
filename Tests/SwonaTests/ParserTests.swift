@@ -1,7 +1,7 @@
 import Swona
 import XCTest
 
-final class ParserTests: XCTestCase {
+@MainActor final class ParserTests: XCTestCase {
     func testVariables() throws {
         try assertParseExpression(source: "foo", expected: "[Ref foo]")
     }
@@ -159,24 +159,5 @@ final class ParserTests: XCTestCase {
         XCTAssertEqual(expected, expression.description, source)
     }
 
-    static var allTests = [
-        ("testVariables", testVariables),
-        ("testLiterals", testLiterals),
-        ("testIfStatements", testIfStatements),
-        ("testUnlessStatements", testUnlessStatements),
-        ("testWhileStatements", testWhileStatements),
-        ("testAssignment", testAssignment),
-        ("testVars", testVars),
-        ("testVals", testVals),
-        ("testIfAsAnExpression", testIfAsAnExpression),
-        ("testUnlessAsAnExpression", testUnlessAsAnExpression),
-        ("testExpressionList", testExpressionList),
-        ("testAssignmentToLiteralIsSyntaxError", testAssignmentToLiteralIsSyntaxError),
-        ("testBinaryOperators", testBinaryOperators),
-        ("testNot", testNot),
-        ("testOperatorPrecedence", testOperatorPrecedence),
-        ("testFunctionCall", testFunctionCall),
-        ("testFunctionDefinition", testFunctionDefinition),
-        ("testSamples", testSamples),
-    ]
+
 }

@@ -1,7 +1,7 @@
 import Swona
 import XCTest
 
-final class OptimizerTests: XCTestCase {
+@MainActor final class OptimizerTests: XCTestCase {
     let env = GlobalStaticEnvironment()
 
     func testEvaluateConstantExpressions() throws {
@@ -114,16 +114,4 @@ final class OptimizerTests: XCTestCase {
         XCTAssertEqual([IR.add, IR.multiply], block.opCodes)
     }
 
-    static var allTests = [
-        ("testEvaluateConstantExpressions", testEvaluateConstantExpressions),
-        ("testConstantIf", testConstantIf),
-        ("testWhileFalse", testWhileFalse),
-        ("testNot", testNot),
-        ("testPropagateConstantVariables", testPropagateConstantVariables),
-        ("testSimpleConstantEvaluation", testSimpleConstantEvaluation),
-        ("testDivisionByZeroWillNotBeThrownAtCompileTime", testDivisionByZeroWillNotBeThrownAtCompileTime),
-        ("testOptimizeStoreFollowedByLoad", testOptimizeStoreFollowedByLoad),
-        ("testRemoveRedundantStoreAndLoad", testRemoveRedundantStoreAndLoad),
-        ("testRemoveRedundantPushUnits", testRemoveRedundantPushUnits),
-    ]
 }

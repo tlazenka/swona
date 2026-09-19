@@ -1,7 +1,7 @@
 import Swona
 import XCTest
 
-final class LexerTests: XCTestCase {
+@MainActor final class LexerTests: XCTestCase {
     func testEmptySourceHasNoTokens() throws {
         assertNoTokens(source: "")
         assertNoTokens(source: "  ")
@@ -205,26 +205,5 @@ final class LexerTests: XCTestCase {
         """, location.toLongString())
     }
 
-    static var allTests = [
-        ("testEmptySourceHasNoTokens", testEmptySourceHasNoTokens),
-        ("testKeywords", testKeywords),
-        ("testIdentifiers", testIdentifiers),
-        ("testOperators", testOperators),
-        ("testPunctuation", testPunctuation),
-        ("testLiteralNumbers", testLiteralNumbers),
-        ("testLiteralBooleans", testLiteralBooleans),
-        ("testLiteralStrings", testLiteralStrings),
-        ("testUnterminatedStringLiteral", testUnterminatedStringLiteral),
-        ("testUnexpectedCharacter", testUnexpectedCharacter),
-        ("testMultipleTokens", testMultipleTokens),
-        ("testTokenLocations", testTokenLocations),
-        ("testNextTokenOnEmptyThrowsSyntaxError", testNextTokenOnEmptyThrowsSyntaxError),
-        ("testBasicLookAhead", testBasicLookAhead),
-        ("testConditionalReading", testConditionalReading),
-        ("testConditionalReadingWorksOnEndOfInput", testConditionalReadingWorksOnEndOfInput),
-        ("testExpect", testExpect),
-        ("testUnmetExpectThrowsError", testUnmetExpectThrowsError),
-        ("testDefaultToStringProvidesBasicInfo", testDefaultToStringProvidesBasicInfo),
-        ("testStringRepresentationProvidesInformationAboutCurrentLine", testStringRepresentationProvidesInformationAboutCurrentLine),
-    ]
+
 }

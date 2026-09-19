@@ -1,7 +1,7 @@
 import Swona
 import XCTest
 
-final class VMTests: XCTestCase {
+@MainActor final class VMTests: XCTestCase {
     let evaluator = Evaluator(trace: false)
 
     func testLiteralEvaluation() throws {
@@ -265,34 +265,5 @@ final class VMTests: XCTestCase {
         try evaluator.evaluate(code: code).value
     }
 
-    static var allTests = [
-        ("testLiteralEvaluation", testLiteralEvaluation),
-        ("testVariableEvaluation", testVariableEvaluation),
-        ("testVarStatements", testVarStatements),
-        ("testAssignments", testAssignments),
-        ("testArithmetic", testArithmetic),
-        ("testIfExpressions", testIfExpressions),
-        ("testIfExpressionValues", testIfExpressionValues),
-        ("testUnlessExpressions", testUnlessExpressions),
-        ("testUnlessExpressionValues", testUnlessExpressionValues),
-        ("testBinaryExpressions", testBinaryExpressions),
-        ("testIfWithoutElse", testIfWithoutElse),
-        ("testWhileLoop", testWhileLoop),
-        ("testNot", testNot),
-        ("testEvaluationFailuresForCoercions", testEvaluationFailuresForCoercions),
-        ("testDirectCalls", testDirectCalls),
-        ("testFunctionCallsThroughLocalVariable", testFunctionCallsThroughLocalVariable),
-        ("testFunctionCallsThroughExpression", testFunctionCallsThroughExpression),
-        ("testExpressionFunctions", testExpressionFunctions),
-        ("testEvaluationFailsForUnboundVariables", testEvaluationFailsForUnboundVariables),
-        ("testLogicalOperators", testLogicalOperators),
-        ("testEvaluationFailsForRebindingVariables", testEvaluationFailsForRebindingVariables),
-        ("testPlusWithStringLiteralOnLeftSideIsStringConcatenation", testPlusWithStringLiteralOnLeftSideIsStringConcatenation),
-        ("testRelationalOperators", testRelationalOperators),
-        ("testNativeFunctionCallWithSingleParameter", testNativeFunctionCallWithSingleParameter),
-        ("testNativeFunctionCallWithMultipleParameters", testNativeFunctionCallWithMultipleParameters),
-        ("testNestedIfs", testNestedIfs),
-        ("testRecursion", testRecursion),
-        ("testRuntimeFunctions", testRuntimeFunctions),
-    ]
+
 }

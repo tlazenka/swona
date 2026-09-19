@@ -13,7 +13,7 @@
 import XCTest
 @testable import Swona
 
-final class OrderedSetTests: XCTestCase {
+@MainActor final class OrderedSetTests: XCTestCase {
     func testOrderedSetWithSingleElement() {
         var orderedSet = OrderedSet<String>()
         XCTAssertEqual(orderedSet.count, 0)
@@ -187,11 +187,4 @@ final class OrderedSetTests: XCTestCase {
         XCTAssert(three)
     }
 
-    static var allTests = [
-        ("testOrderedSetWithSingleElement", testOrderedSetWithSingleElement),
-        ("testOrderedSetWithMultipleElements", testOrderedSetWithMultipleElements),
-        ("testOrderedSetFromArray", testOrderedSetFromArray),
-        ("testOrderedSetExtensions", testOrderedSetExtensions),
-        ("testOrderedSetBasics", testOrderedSetBasics),
-    ]
 }

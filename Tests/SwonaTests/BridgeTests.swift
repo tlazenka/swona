@@ -1,7 +1,7 @@
 import XCTest
 @testable import Swona
 
-final class BridgeTests: XCTestCase {
+@MainActor final class BridgeTests: XCTestCase {
     func testBridge() throws {
         let b = try Bridge()
         b.x = "string1".value
@@ -70,10 +70,4 @@ final class BridgeTests: XCTestCase {
         XCTAssertEqual(elements.array, ["item1".value, "item2".value, "item3".value])
     }
 
-    static var allTests = [
-        ("testBridge", testBridge),
-        ("testBridgedRuntimeFunctions", testBridgedRuntimeFunctions),
-        ("testCallAsFunction", testCallAsFunction),
-        ("testValueArray", testValueArray),
-    ]
 }

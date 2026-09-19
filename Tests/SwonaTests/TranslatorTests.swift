@@ -1,7 +1,7 @@
 import Swona
 import XCTest
 
-final class TranslatorTests: XCTestCase {
+@MainActor final class TranslatorTests: XCTestCase {
     func testStackDelta() {
         let block = BasicBlock()
 
@@ -188,13 +188,4 @@ final class TranslatorTests: XCTestCase {
         XCTAssertEqual(instructions, expectedInstructions)
     }
 
-    static var allTests = [
-        ("testStackDelta", testStackDelta),
-        ("testLocalVariableOffsets", testLocalVariableOffsets),
-        ("testJumpBackwardsDoesNotMaintainBalance", testJumpBackwardsDoesNotMaintainBalance),
-        ("testStackUnderflow", testStackUnderflow),
-        ("testSimpleTranslation", testSimpleTranslation),
-        ("testReadMeExample", testReadMeExample),
-        ("testRuntimeFunctions", testRuntimeFunctions),
-    ]
 }
