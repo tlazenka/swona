@@ -29,11 +29,9 @@ jobs:
     runs-on: xcode-27
 
     steps:
-     - name: Install Mint
-       run: brew list mint &>/dev/null || brew install mint
      - uses: actions/checkout@v2
-     - name: Run SwiftFormat lint
-       run: mint run nicklockwood/SwiftFormat@ --lint .
+     - name: Run swift-format lint
+	   run: swift format lint --recursive .
 
   repl:
 

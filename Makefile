@@ -4,7 +4,7 @@ test:
 	
 .PHONY: format
 format:
-	mint run nicklockwood/SwiftFormat . 
+	swift format --in-place --recursive . 
 
 .PHONY: test-docker
 test-docker:
