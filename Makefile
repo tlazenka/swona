@@ -4,7 +4,7 @@ test:
 	
 .PHONY: format
 format:
-	mint run nicklockwood/SwiftFormat@0.46.2 . 
+	mint run nicklockwood/SwiftFormat . 
 
 .PHONY: test-docker
 test-docker:
