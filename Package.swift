@@ -4,26 +4,25 @@
 import PackageDescription
 
 let package = Package(
-    name: "Swona",
-    products: [
-        .library(
-            name: "Swona",
-            targets: ["Swona"]
-        ),
-    ],
-    dependencies: [
-    ],
-    targets: [
-        .target(
-            name: "Swona",
-            dependencies: [],
-            swiftSettings: [
-                .defaultIsolation(MainActor.self),
-            ]
-        ),
-        .testTarget(
-            name: "SwonaTests",
-            dependencies: ["Swona"]
-        ),
-    ]
+  name: "Swona",
+  products: [
+    .library(
+      name: "Swona",
+      targets: ["Swona"]
+    )
+  ],
+  dependencies: [],
+  targets: [
+    .target(
+      name: "Swona",
+      dependencies: [],
+      swiftSettings: [
+        .defaultIsolation(MainActor.self)
+      ]
+    ),
+    .testTarget(
+      name: "SwonaTests",
+      dependencies: ["Swona"]
+    ),
+  ]
 )

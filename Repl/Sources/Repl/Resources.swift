@@ -8,53 +8,54 @@
 import Foundation
 
 protocol FileType {
-    var isDirectory: Bool { get }
-    var filename: String { get }
-    func export(to path: String) throws
+  var isDirectory: Bool { get }
+  var filename: String { get }
+  func export(to path: String) throws
 }
 protocol File: FileType {
-    var contentsBase64: String { get }
+  var contentsBase64: String { get }
 }
 extension File {
-    var isDirectory: Bool {
-        return false
-    }
-    var contents: Data? {
-        return Data(base64Encoded: contentsBase64)
-    }
+  var isDirectory: Bool {
+    return false
+  }
+  var contents: Data? {
+    return Data(base64Encoded: contentsBase64)
+  }
 
-    func export(to path: String) throws {
-        guard let contents = contents else { return }
-        let originalUrl = URL(fileURLWithPath: path)
-        let myUrl = originalUrl.appendingPathComponent(filename)
-        try contents.write(to: myUrl)
-    }
+  func export(to path: String) throws {
+    guard let contents = contents else { return }
+    let originalUrl = URL(fileURLWithPath: path)
+    let myUrl = originalUrl.appendingPathComponent(filename)
+    try contents.write(to: myUrl)
+  }
 }
 protocol Directory: FileType {
-    var children: [FileType] { get }
+  var children: [FileType] { get }
 }
 extension Directory {
-    var isDirectory: Bool {
-        return true
-    }
-    func export(to path: String) throws {
-        let originalUrl = URL(fileURLWithPath: path)
-        let myUrl = originalUrl.appendingPathComponent(filename)
-        try FileManager.default.createDirectory(at: myUrl, withIntermediateDirectories: true, attributes: nil)
-        try children.forEach { try $0.export(to: myUrl.path) }
-    }
+  var isDirectory: Bool {
+    return true
+  }
+  func export(to path: String) throws {
+    let originalUrl = URL(fileURLWithPath: path)
+    let myUrl = originalUrl.appendingPathComponent(filename)
+    try FileManager.default.createDirectory(at: myUrl, withIntermediateDirectories: true, attributes: nil)
+    try children.forEach { try $0.export(to: myUrl.path) }
+  }
 }
 class Resources: Directory {
-    var filename: String = "Resources"
-    lazy var children: [FileType] = {
-        return [Prelude_Sk()]
-    }()
+  var filename: String = "Resources"
+  lazy var children: [FileType] = {
+    return [Prelude_Sk()]
+  }()
 
-    class Prelude_Sk: File {
+  class Prelude_Sk: File {
     var filename: String = "prelude.sk"
     lazy var contentsBase64: String = {
-        return "ZnVuIHNxdWFyZSh4OiBJbnQpID0geCAqIHgKZnVuIGN1YmUoeDogSW50KSA9IHggKiB4ICogeAoKZnVuIGZpYihpOiBJbnQpOiBJbnQgPQogICAgaWYgKGkgPT0gMCB8fCBpID09IDEpCiAgICAgICAgaQogICAgZWxzZQogICAgICAgIGZpYihpLTEpICsgZmliKGktMikK"
+      return
+        "ZnVuIHNxdWFyZSh4OiBJbnQpID0geCAqIHgKZnVuIGN1YmUoeDogSW50KSA9IHggKiB4ICogeAoKZnVuIGZpYihpOiBJbnQpOiBJbnQgPQogICAgaWYgKGkgPT0gMCB8fCBpID09IDEpCiAgICAgICAgaQogICAgZWxzZQogICAgICAgIGZpYihpLTEpICsgZmliKGktMikK"
     }()
-}
+  }
 
 }
