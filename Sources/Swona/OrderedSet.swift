@@ -14,7 +14,7 @@
 
 /// An ordered set is an ordered collection of instances of `Element` in which
 /// uniqueness of the objects is guaranteed.
-public struct OrderedSet<E: Hashable>: Equatable, Collection {
+public struct OrderedSet<E: Hashable>: Equatable, @MainActor Collection {
     public typealias Element = E
 
     var array: [Element]

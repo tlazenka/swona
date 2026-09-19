@@ -35,7 +35,7 @@ public struct SourceLocation: Equatable, CustomStringConvertible {
  *
  * Syntax errors can originate either in the lexer or the parser.
  */
-open class SyntaxErrorException: Error, CustomStringConvertible {
+@MainActor open class SyntaxErrorException: Error, CustomStringConvertible {
     public let errorMessage: String, sourceLocation: SourceLocation
 
     init(errorMessage: String, sourceLocation: SourceLocation) {
